@@ -3,7 +3,7 @@
    • quando há internet, a página vem sempre da rede (atualizações chegam sozinhas);
    • Firebase e APIs do Google nunca passam por aqui: login e sincronização vão direto à rede;
    • mostra os avisos de lembrete e abre o app quando a pessoa toca neles. */
-const CORE = 'pontual-core-v3';
+const CORE = 'pontual-core-v4';
 const FONT = 'pontual-fonts-v1';
 const SHELL = ['./', 'index.html', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'apple-touch-icon.png'];
 
@@ -58,6 +58,16 @@ self.addEventListener('fetch', e => {
   }
   if (req.mode === 'navigate') e.respondWith(pageFirst(req));
   else e.respondWith(swr(req));
+});
+
+/* push vindo do servidor (função enviarLembretes): sempre mostra um aviso (o iPhone exige) */
+self.addEventListener('push', e => {
+  let d = {};
+  try { d = e.data ? e.data.json() : {}; } catch (_) { d = { body: e.data ? e.data.text() : '' }; }
+  e.waitUntil(self.registration.showNotification(d.title || 'Pontual', {
+    body: d.body || '', tag: d.tag || 'pontual', icon: 'icon-192.png', badge: 'icon-192.png', renotify: true,
+    data: { url: d.url || './?acao=registrar' }
+  }));
 });
 
 /* toque no aviso: foca o app (ou abre) e pede para registrar */
