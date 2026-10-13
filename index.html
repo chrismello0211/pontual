@@ -1,0 +1,1802 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<title>Pontual — mapa de aplicações</title>
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   CONTA NA NUVEM (Firebase) — projeto pontual-7d0cf
+   A chave abaixo é pública por natureza: quem protege os dados são
+   as regras do banco (cada pessoa só lê e grava a própria área).
+   Deixando os dois campos vazios, o app funciona só neste aparelho.
+   ═══════════════════════════════════════════════════════════════ */
+window.PONTUAL_NUVEM = {
+  chave: 'AIzaSyAC8-YEvkSOthGzMKyIExAM76uLELkKljs',
+  banco: 'https://pontual-7d0cf-default-rtdb.firebaseio.com'
+};
+</script>
+<meta name="description" content="Registre onde você aplicou e nunca mais repita o mesmo ponto.">
+<meta name="theme-color" content="#E9ECE4" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0F1220" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Pontual">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Martian+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   PONTUAL — identidade
+   papel porcelana · tinta azul-preta · caneta violeta · marca-texto
+   ============================================================ */
+:root{
+  --paper:#E9ECE4;
+  --paper-2:#DFE3D9;
+  --card:#F8F9F5;
+  --card-2:#FFFFFF;
+  --ink:#161A2B;
+  --ink-2:#3D4356;
+  --muted:#787F8E;
+  --rule:rgba(22,26,43,.13);
+  --rule-2:rgba(22,26,43,.30);
+  --violet:#3B2CC4;
+  --violet-rgb:59,44,196;
+  --mark:#CFE035;
+  --green:#0F6E5C;
+  --warn:#B4442A;
+  --on-mark:#161A2B;
+  --shadow:0 1px 0 rgba(22,26,43,.05), 0 14px 30px -22px rgba(22,26,43,.55);
+  --skin:rgba(22,26,43,.055);
+  --skin-solid:#D9DCD2;
+  --green-wash:rgba(15,110,92,.13);
+  --skin-line:rgba(22,26,43,.30);
+  --r:16px;
+  --tap:rgba(22,26,43,.05);
+}
+[data-theme="dark"]{
+  --paper:#0F1220;
+  --paper-2:#0A0C16;
+  --card:#171B2B;
+  --card-2:#1D2233;
+  --ink:#E9ECE2;
+  --ink-2:#B9C0CF;
+  --muted:#7C8496;
+  --rule:rgba(233,236,226,.14);
+  --rule-2:rgba(233,236,226,.32);
+  --violet:#8C7BFF;
+  --violet-rgb:140,123,255;
+  --mark:#D4E24A;
+  --green:#4CBFA0;
+  --warn:#FF8666;
+  --on-mark:#0F1220;
+  --shadow:0 1px 0 rgba(0,0,0,.35), 0 16px 34px -22px #000;
+  --skin:rgba(233,236,226,.06);
+  --skin-solid:#262B40;
+  --green-wash:rgba(76,191,160,.16);
+  --skin-line:rgba(233,236,226,.34);
+  --tap:rgba(233,236,226,.06);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  background:var(--paper);
+  color:var(--ink);
+  font-family:'Archivo',system-ui,-apple-system,'Segoe UI',sans-serif;
+  font-size:15px;line-height:1.45;
+  -webkit-font-smoothing:antialiased;
+  overscroll-behavior-y:none;
+}
+/* textura de papel */
+body::after{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:1;opacity:.5;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.055'/%3E%3C/svg%3E");
+  mix-blend-mode:multiply;
+}
+[data-theme="dark"] body::after{mix-blend-mode:screen;opacity:.35}
+
+.wrap{max-width:480px;margin:0 auto;position:relative;z-index:2;
+  padding:0 18px calc(96px + env(safe-area-inset-bottom));}
+
+/* ---------- tipografia utilitária ---------- */
+.mono{font-family:'Martian Mono',ui-monospace,SFMono-Regular,Menlo,monospace}
+.eyebrow{font-family:'Martian Mono',ui-monospace,monospace;font-size:9px;font-weight:600;
+  letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+.display{font-family:'Bricolage Grotesque','Archivo',sans-serif;font-weight:800;letter-spacing:-.03em;line-height:.92}
+h1,h2,h3{margin:0;font-family:'Bricolage Grotesque','Archivo',sans-serif;letter-spacing:-.02em}
+.mark{background:linear-gradient(180deg,transparent 14%,var(--mark) 14%,var(--mark) 86%,transparent 86%);
+  color:var(--on-mark);padding:0 .22em;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+
+/* ---------- cabeçalho ---------- */
+header{
+  position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--paper) 88%,transparent);
+  backdrop-filter:saturate(1.4) blur(14px);-webkit-backdrop-filter:saturate(1.4) blur(14px);
+  border-bottom:1px solid var(--rule);
+  padding:calc(10px + env(safe-area-inset-top)) 18px 10px;
+}
+.hrow{max-width:480px;margin:0 auto;display:flex;align-items:center;gap:10px}
+.logo{display:flex;align-items:center;gap:9px}
+.logo svg{display:block}
+.logo b{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:19px;letter-spacing:-.045em}
+.logo span{font-family:'Martian Mono',monospace;font-size:8px;letter-spacing:.14em;color:var(--muted);text-transform:uppercase}
+.icon-btn{margin-left:auto;width:36px;height:36px;border-radius:11px;border:1px solid var(--rule);
+  background:var(--card);color:var(--ink-2);display:grid;place-items:center;cursor:pointer;flex:0 0 auto}
+.icon-btn:active{background:var(--tap)}
+
+/* ---------- cartões ---------- */
+.card{background:var(--card);border:1px solid var(--rule);border-radius:var(--r);box-shadow:var(--shadow)}
+/* "rótulo de manipulação" — o cartão assinatura */
+.rotulo{
+  background:var(--card);border:1px solid var(--rule-2);border-radius:5px;position:relative;
+  padding:16px 16px 15px;box-shadow:var(--shadow);overflow:hidden;
+}
+.rotulo::before{content:'';position:absolute;left:0;right:0;top:0;height:5px;background:var(--violet)}
+.rotulo::after{content:'';position:absolute;left:0;right:0;top:9px;height:1px;
+  background-image:repeating-linear-gradient(to right,var(--rule-2) 0 3px,transparent 3px 7px)}
+.rotulo .body{padding-top:8px}
+
+.section{margin-top:26px}
+.section-h{display:flex;align-items:baseline;gap:10px;margin-bottom:11px}
+.section-h .line{flex:1;height:1px;background:var(--rule)}
+
+/* ---------- contagem ---------- */
+.count{display:flex;align-items:center;gap:16px}
+.ring{flex:0 0 auto;position:relative;width:78px;height:78px}
+.ring svg{transform:rotate(-90deg)}
+.ring .val{position:absolute;inset:0;display:grid;place-items:center;font-family:'Bricolage Grotesque',sans-serif;
+  font-weight:800;font-size:25px;letter-spacing:-.04em}
+.count .txt h2{font-size:21px;line-height:1.1;margin-bottom:3px}
+.count .txt p{margin:0;color:var(--muted);font-size:13px}
+
+/* ---------- botões ---------- */
+.btn{width:100%;border:0;border-radius:13px;padding:15px 16px;font-family:'Archivo',sans-serif;
+  font-weight:600;font-size:15.5px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;
+  transition:transform .12s ease}
+.btn:active{transform:scale(.982)}
+.btn-primary{background:var(--ink);color:var(--paper)}
+.btn-ghost{background:transparent;color:var(--ink);border:1px solid var(--rule-2)}
+.btn-soft{background:var(--card);color:var(--ink);border:1px solid var(--rule)}
+.btn-danger{background:transparent;color:var(--warn);border:1px solid color-mix(in srgb,var(--warn) 40%,transparent)}
+.btn-sm{padding:10px 14px;font-size:13.5px;border-radius:10px;width:auto}
+
+/* ---------- chips ---------- */
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{border:1px solid var(--rule-2);background:transparent;color:var(--ink-2);border-radius:999px;
+  padding:7px 13px;font-size:13px;font-family:'Archivo',sans-serif;cursor:pointer;transition:.14s}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.chip.v[aria-pressed="true"]{background:var(--violet);border-color:var(--violet);color:#fff}
+
+/* ---------- mapa do corpo ---------- */
+.map-stage{position:relative;padding:6px 0 2px}
+#bodyMap{width:100%;height:auto;display:block;touch-action:manipulation}
+.zone{cursor:pointer;transition:fill .25s ease, stroke .2s ease}
+.zone-label{font-family:'Martian Mono',monospace;font-size:9px;font-weight:600;fill:var(--muted);pointer-events:none}
+
+.rot-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--rule);
+  border:1px solid var(--rule);border-radius:8px;overflow:hidden;margin-top:16px}
+.rot{background:var(--card);padding:9px 11px 10px;text-align:left;border:0;cursor:pointer;font-family:inherit;color:inherit}
+.rot:active{background:var(--tap)}
+.rot b{display:block;font-size:11.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:5px}
+.rot .bar{display:block;height:4px;border-radius:99px;background:var(--rule-2);overflow:hidden;margin-bottom:6px}
+.rot .bar i{display:block;height:100%;border-radius:99px}
+.rot small{font-family:'Martian Mono',monospace;font-size:8px;letter-spacing:.05em;color:var(--muted);text-transform:uppercase}
+.rot[data-sug="1"] b{background:var(--mark);color:var(--on-mark);display:inline-block;padding:0 4px;border-radius:3px}
+.edge{font-family:'Martian Mono',monospace;font-size:8px;letter-spacing:.2em;fill:var(--muted);opacity:.75}
+.dot{pointer-events:none}
+@keyframes inkin{0%{r:0;opacity:0}60%{r:5.4;opacity:1}100%{r:3.4;opacity:1}}
+.dot.new{animation:inkin .5s cubic-bezier(.2,.9,.3,1) both}
+@keyframes pulse{0%{opacity:.85;transform:scale(1)}70%{opacity:0;transform:scale(1.5)}100%{opacity:0}}
+.suggest-ring{transform-origin:center;transform-box:fill-box;animation:pulse 2.4s ease-out infinite}
+
+.legend{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:6px}
+.legend i{width:13px;height:13px;border-radius:4px;display:inline-block;border:1px solid var(--rule-2)}
+.legend span{font-size:11px;color:var(--muted)}
+
+.zone-info{margin-top:14px;border-top:1px dashed var(--rule-2);padding-top:14px;
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.zone-info .who{flex:1;min-width:150px}
+.zone-info h3{font-size:16.5px;margin-bottom:2px}
+.zone-info p{margin:0;font-size:12.5px;color:var(--muted)}
+
+/* ---------- listas ---------- */
+.entry{display:flex;gap:12px;align-items:center;width:100%;text-align:left;background:var(--card);
+  border:1px solid var(--rule);border-left:3px solid var(--violet);border-radius:4px;
+  padding:11px 13px;cursor:pointer;font-family:inherit;color:inherit;margin-bottom:7px}
+.entry:active{background:var(--tap)}
+.entry .d{flex:0 0 42px;text-align:center;line-height:1.05}
+.entry .d b{display:block;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:19px}
+.entry .d small{font-family:'Martian Mono',monospace;font-size:8px;letter-spacing:.1em;color:var(--muted);text-transform:uppercase}
+.entry .m{flex:1;min-width:0}
+.entry .m b{display:block;font-size:14.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.entry .m small{color:var(--muted);font-size:11.5px}
+.entry .dose{font-family:'Martian Mono',monospace;font-size:10.5px;font-weight:600;
+  border:1px solid var(--rule-2);border-radius:4px;padding:3px 6px;white-space:nowrap}
+
+.month-h{font-family:'Martian Mono',monospace;font-size:9px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--muted);margin:18px 0 9px}
+
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:8px;overflow:hidden}
+.stat{background:var(--card);padding:13px 14px}
+.stat b{display:block;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:24px;letter-spacing:-.03em;line-height:1.1}
+.stat span{font-size:11.5px;color:var(--muted)}
+
+.empty{text-align:center;padding:34px 20px;color:var(--muted)}
+.empty b{display:block;color:var(--ink);font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:17px;margin-bottom:5px}
+.empty p{margin:0;font-size:13.5px}
+
+/* ---------- campos ---------- */
+.field{margin-bottom:15px}
+.field > label{display:block;margin-bottom:6px}
+input[type=text],input[type=email],input[type=password],input[type=number],input[type=datetime-local],input[type=date],select,textarea{
+  width:100%;background:var(--card-2);border:1px solid var(--rule-2);border-radius:10px;
+  padding:12px 13px;font-family:'Archivo',sans-serif;font-size:15.5px;color:var(--ink);appearance:none}
+textarea{resize:vertical;min-height:70px}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--violet);outline-offset:1px;border-color:transparent}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.row-sw{display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--rule)}
+.row-sw:last-child{border-bottom:0}
+.row-sw .t{flex:1}
+.row-sw .t b{display:block;font-size:14.5px;font-weight:600}
+.row-sw .t span{font-size:12px;color:var(--muted)}
+
+/* ---------- sheet ---------- */
+.scrim{position:fixed;inset:0;background:rgba(10,12,22,.5);z-index:60;opacity:0;transition:opacity .22s;
+  backdrop-filter:blur(2px)}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:61;background:var(--paper);
+  border-radius:22px 22px 0 0;border-top:1px solid var(--rule-2);
+  max-height:92vh;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  transform:translateY(101%);transition:transform .3s cubic-bezier(.22,1,.3,1);
+  padding:8px 18px calc(24px + env(safe-area-inset-bottom));box-shadow:0 -18px 44px -22px rgba(0,0,0,.5)}
+.sheet-open .scrim{opacity:1}
+.sheet-open .sheet{transform:translateY(0)}
+.grab{width:38px;height:4px;border-radius:99px;background:var(--rule-2);margin:6px auto 14px}
+.sheet h2{font-size:22px;margin-bottom:3px}
+.sheet .sub{color:var(--muted);font-size:13px;margin:0 0 20px}
+.sheet .sub b{color:var(--ink)}
+.sheet-actions{display:flex;gap:9px;margin-top:8px}
+.sheet-actions .btn{flex:1}
+
+/* ---------- nuvem ---------- */
+.hact{margin-left:auto;display:flex;gap:8px;align-items:center}
+.hact .icon-btn{margin-left:0}
+#cloudBtn{position:relative}
+#cloudBtn .dot{position:absolute;top:5px;right:5px;width:9px;height:9px;border-radius:50%;
+  border:2px solid var(--card);background:var(--muted);display:none}
+#cloudBtn[data-s="off"]{color:var(--muted)}
+#cloudBtn[data-s="ok"] .dot{display:block;background:var(--green)}
+#cloudBtn[data-s="err"] .dot{display:block;background:var(--warn)}
+#cloudBtn[data-s="offline"] .dot{display:block;background:var(--muted)}
+#cloudBtn[data-s="sync"] .dot{display:block;background:var(--violet);animation:blink 1s ease-in-out infinite}
+@keyframes blink{50%{opacity:.25}}
+
+.acct h3{font-size:19px;line-height:1.1;margin-bottom:6px}
+.acct .who{font-family:'Martian Mono',monospace;font-size:12.5px;font-weight:600;word-break:break-all;margin-bottom:6px}
+.acct .stat-line{font-size:12.5px;color:var(--muted);margin:0 0 15px;display:flex;align-items:center}
+.acct .acts{display:flex;gap:9px}
+.acct .acts .btn{flex:1}
+.sd{display:inline-block;flex:0 0 auto;width:8px;height:8px;border-radius:50%;margin-right:8px;background:var(--muted)}
+.sd[data-s="ok"]{background:var(--green)}
+.sd[data-s="err"]{background:var(--warn)}
+.sd[data-s="sync"]{background:var(--violet);animation:blink 1s ease-in-out infinite}
+
+.seg{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--rule-2);border-radius:11px;overflow:hidden;margin-bottom:16px}
+.seg button{background:transparent;border:0;padding:11px 8px;font-family:'Archivo',sans-serif;font-weight:600;
+  font-size:14px;color:var(--ink-2);cursor:pointer}
+.seg button[aria-selected="true"]{background:var(--ink);color:var(--paper)}
+.pw{position:relative}
+.pw input{padding-right:84px}
+.pw button{position:absolute;right:4px;top:50%;transform:translateY(-50%);background:transparent;border:0;
+  color:var(--violet);font-family:'Martian Mono',monospace;font-size:10px;letter-spacing:.08em;
+  text-transform:uppercase;font-weight:600;padding:10px;cursor:pointer}
+.msg{min-height:20px;font-size:13px;line-height:1.4;margin:0 0 12px}
+.msg.err{color:var(--warn)}
+.msg.ok{color:var(--green)}
+.linkbtn{background:none;border:0;padding:8px;color:var(--violet);font-family:'Archivo',sans-serif;
+  font-weight:600;font-size:13px;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+
+/* ---------- tabs ---------- */
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:40;
+  background:color-mix(in srgb,var(--paper) 90%,transparent);
+  backdrop-filter:saturate(1.4) blur(16px);-webkit-backdrop-filter:saturate(1.4) blur(16px);
+  border-top:1px solid var(--rule);padding-bottom:env(safe-area-inset-bottom)}
+nav.tabs .inner{max-width:480px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr)}
+nav.tabs button{background:none;border:0;padding:9px 0 8px;cursor:pointer;color:var(--muted);
+  display:flex;flex-direction:column;align-items:center;gap:3px;font-family:'Martian Mono',monospace;
+  font-size:8.5px;letter-spacing:.08em;text-transform:uppercase}
+nav.tabs button[aria-selected="true"]{color:var(--ink)}
+nav.tabs button[aria-selected="true"] .ic{background:var(--mark);border-radius:8px}
+nav.tabs .ic{padding:3px 9px;transition:background .2s}
+
+/* ---------- toast ---------- */
+#toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom));transform:translate(-50%,14px);
+  background:var(--ink);color:var(--paper);padding:11px 17px;border-radius:11px;font-size:13.5px;font-weight:500;
+  z-index:80;opacity:0;pointer-events:none;transition:.25s;width:max-content;max-width:88vw;text-align:center}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+
+.note{font-size:11.5px;color:var(--muted);line-height:1.5}
+.spark{display:block;width:100%;height:44px}
+hr.dash{border:0;border-top:1px dashed var(--rule-2);margin:16px 0}
+[hidden]{display:none !important}
+@media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}}
+:focus-visible{outline:2px solid var(--violet);outline-offset:2px;border-radius:6px}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hrow">
+    <div class="logo">
+      <svg width="28" height="28" viewBox="0 0 32 32" aria-hidden="true">
+        <rect x="1" y="1" width="30" height="30" rx="9" fill="var(--ink)"/>
+        <circle cx="11" cy="11" r="2.4" fill="var(--paper)" opacity=".3"/>
+        <circle cx="21" cy="11" r="2.4" fill="var(--paper)" opacity=".5"/>
+        <circle cx="11" cy="21" r="2.4" fill="var(--paper)" opacity=".72"/>
+        <circle cx="21" cy="21" r="3.4" fill="var(--mark)"/>
+      </svg>
+      <div>
+        <b>Pontual</b><br>
+        <span>mapa de aplicações</span>
+      </div>
+    </div>
+    <div class="hact">
+      <button class="icon-btn" id="cloudBtn" data-s="off" aria-label="Conta e nuvem: entrar" title="Conta e nuvem: entrar" hidden>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/>
+        </svg>
+        <span class="dot"></span>
+      </button>
+      <button class="icon-btn" id="themeBtn" aria-label="Alternar tema">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round">
+          <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- ======================= HOJE ======================= -->
+  <section id="view-hoje">
+    <div class="section" style="margin-top:20px">
+      <div class="rotulo">
+        <div class="body">
+          <div class="eyebrow" style="margin-bottom:12px">Próxima aplicação</div>
+          <div class="count">
+            <div class="ring">
+              <svg width="78" height="78" viewBox="0 0 78 78">
+                <circle cx="39" cy="39" r="34" fill="none" stroke="var(--rule)" stroke-width="6"/>
+                <circle id="ringFill" cx="39" cy="39" r="34" fill="none" stroke="var(--violet)" stroke-width="6"
+                        stroke-linecap="round" stroke-dasharray="213.6" stroke-dashoffset="213.6"/>
+              </svg>
+              <div class="val" id="ringVal">–</div>
+            </div>
+            <div class="txt">
+              <h2 id="nextTitle">Comece por aqui</h2>
+              <p id="nextSub">Registre a primeira aplicação para o rodízio começar.</p>
+            </div>
+          </div>
+          <hr class="dash">
+          <div class="eyebrow" style="margin-bottom:7px">Local sugerido</div>
+          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+            <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:19px;letter-spacing:-.03em">
+              <span class="mark" id="suggestName">Abdômen superior direito</span>
+            </div>
+          </div>
+          <p class="note" id="suggestWhy" style="margin:9px 0 0"></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <button class="btn btn-primary" id="quickAdd">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round">
+          <path d="M12 5v14M5 12h14"/></svg>
+        Registrar aplicação
+      </button>
+    </div>
+
+    <div class="section">
+      <div class="section-h">
+        <div class="eyebrow">Frasco em uso</div><div class="line"></div>
+      </div>
+      <div class="card" style="padding:14px 15px" id="vialCard"></div>
+    </div>
+
+    <div class="section">
+      <div class="section-h">
+        <div class="eyebrow">Últimas aplicações</div><div class="line"></div>
+      </div>
+      <div id="recentList"></div>
+    </div>
+  </section>
+
+  <!-- ======================= MAPA ======================= -->
+  <section id="view-mapa" hidden>
+    <div class="section" style="margin-top:20px">
+      <div class="section-h">
+        <div class="eyebrow">Toque no ponto exato onde aplicou</div><div class="line"></div>
+      </div>
+      <div class="card" style="padding:12px 10px 16px">
+        <div class="map-stage">
+          <svg id="bodyMap" viewBox="0 0 360 560" xmlns="http://www.w3.org/2000/svg" role="img"
+               aria-label="Mapa do corpo com as áreas de aplicação">
+            <g id="figure" fill="var(--skin-solid)" stroke="var(--skin-solid)" stroke-width="1"
+               stroke-linecap="round">
+              <circle cx="180" cy="48" r="24"/>
+              <rect x="170" y="66" width="20" height="20" rx="8"/>
+              <path d="M180,74 C206,74 228,80 236,94 C243,106 240,150 236,196
+                       C232,240 234,296 238,320 C240,330 234,336 226,336
+                       L134,336 C126,336 120,330 122,320
+                       C126,296 128,240 124,196 C120,150 117,106 124,94
+                       C132,80 154,74 180,74 Z"/>
+              <path d="M126,110 C112,140 106,190 104,248" fill="none" stroke-width="30"/>
+              <path d="M234,110 C248,140 254,190 256,248" fill="none" stroke-width="30"/>
+              <path d="M154,330 C152,390 150,450 148,522" fill="none" stroke-width="50"/>
+              <path d="M206,330 C208,390 210,450 212,522" fill="none" stroke-width="50"/>
+            </g>
+            <!-- anel guia do relógio -->
+            <ellipse cx="180" cy="236" rx="38" ry="45" fill="none" stroke="var(--skin-line)"
+                     stroke-width="1" stroke-dasharray="1 5" opacity=".8"/>
+            <!-- umbigo + zona de exclusão -->
+            <circle cx="180" cy="236" r="16" fill="none" stroke="var(--warn)" stroke-width="1.1"
+                    stroke-dasharray="3 3" opacity=".55"/>
+            <circle cx="180" cy="236" r="4.5" fill="none" stroke="var(--skin-line)" stroke-width="1.6"/>
+            <g id="zones"></g>
+            <g id="dots"></g>
+            <g id="zoneLabels"></g>
+            <text class="edge" x="20" y="290" transform="rotate(-90 20 290)" text-anchor="middle">SEU LADO DIREITO</text>
+            <text class="edge" x="344" y="290" transform="rotate(90 344 290)" text-anchor="middle">SEU LADO ESQUERDO</text>
+          </svg>
+        </div>
+        <div class="legend" style="padding:0 6px">
+          <i style="background:var(--green-wash)"></i><span>livre</span>
+          <i style="background:rgba(var(--violet-rgb),.25)"></i><span>3–6 sem.</span>
+          <i style="background:rgba(var(--violet-rgb),.5)"></i><span>1–3 sem.</span>
+          <i style="background:rgba(var(--violet-rgb),.85)"></i><span>últimos 7 dias</span>
+        </div>
+        <div class="zone-info" id="zoneInfo" hidden>
+          <div class="who">
+            <h3 id="ziName">–</h3>
+            <p id="ziMeta">–</p>
+          </div>
+          <button class="btn btn-primary btn-sm" id="ziAdd">Registrar aqui</button>
+        </div>
+      </div>
+      <p class="note" style="margin-top:10px">
+        Vista de frente. Na barriga são 8 pontos em anel, numerados no sentido horário — o círculo
+        tracejado vermelho é a área de 5 cm ao redor do umbigo, que fica de fora. Cada aplicação
+        vira um ponto de tinta que desbota com as semanas.
+      </p>
+    </div>
+
+    <div class="section">
+      <div class="section-h">
+        <div class="eyebrow">Descanso de cada área</div><div class="line"></div>
+      </div>
+      <div class="rot-grid" id="rotGrid"></div>
+    </div>
+  </section>
+
+  <!-- ======================= DIÁRIO ======================= -->
+  <section id="view-diario" hidden>
+    <div class="section" style="margin-top:20px">
+      <div class="stats" id="statsGrid"></div>
+    </div>
+
+    <div class="section">
+      <div class="section-h">
+        <div class="eyebrow">Peso</div><div class="line"></div>
+        <button class="chip" id="addWeight">+ anotar</button>
+      </div>
+      <div class="card" style="padding:14px 15px" id="weightCard"></div>
+    </div>
+
+    <div class="section">
+      <div class="section-h">
+        <div class="eyebrow">Histórico</div><div class="line"></div>
+      </div>
+      <div id="historyList"></div>
+    </div>
+  </section>
+
+  <!-- ======================= AJUSTES ======================= -->
+  <section id="view-ajustes" hidden>
+    <div class="section" id="acctSection" style="margin-top:20px" hidden>
+      <div class="section-h"><div class="eyebrow">Conta e nuvem</div><div class="line"></div></div>
+      <div class="rotulo acct"><div class="body" id="acctCard"></div></div>
+    </div>
+
+    <div class="section">
+      <div class="section-h"><div class="eyebrow">Tratamento</div><div class="line"></div></div>
+      <div class="card" style="padding:4px 15px 12px">
+        <div class="row-sw" style="display:block">
+          <div class="t" style="margin-bottom:9px"><b>Dose atual</b><span>usada como padrão em novos registros</span></div>
+          <div class="chips" id="doseChips"></div>
+        </div>
+        <div class="row-sw" style="display:block">
+          <div class="t" style="margin-bottom:9px"><b>Intervalo entre aplicações</b><span>dias</span></div>
+          <div class="chips" id="intervalChips"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-h"><div class="eyebrow">Frasco manipulado</div><div class="line"></div></div>
+      <div class="card" style="padding:15px">
+        <div class="field"><label class="eyebrow">Farmácia</label>
+          <input type="text" id="setPharm" maxlength="80" placeholder="Nome da farmácia de manipulação"></div>
+        <div class="two">
+          <div class="field"><label class="eyebrow">Lote</label>
+            <input type="text" id="setLot" maxlength="60" placeholder="000000"></div>
+          <div class="field"><label class="eyebrow">Concentração</label>
+            <input type="text" id="setConc" maxlength="60" placeholder="mg/mL"></div>
+        </div>
+        <div class="field" style="margin-bottom:0"><label class="eyebrow">Validade</label>
+          <input type="date" id="setVal"></div>
+        <p class="note" style="margin-top:12px">
+          Guardar lote, concentração e validade importa: em produto manipulado a concentração muda de
+          lote para lote, e é ela que define quantos mL correspondem à sua dose.
+        </p>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-h"><div class="eyebrow">Lembrete</div><div class="line"></div></div>
+      <div class="card" style="padding:15px">
+        <div class="field"><label class="eyebrow">Dia e hora preferidos</label>
+          <div class="two">
+            <select id="setWeekday">
+              <option value="0">Domingo</option><option value="1">Segunda</option><option value="2">Terça</option>
+              <option value="3">Quarta</option><option value="4">Quinta</option><option value="5">Sexta</option>
+              <option value="6">Sábado</option>
+            </select>
+            <input type="text" id="setHour" inputmode="numeric" placeholder="21:00">
+          </div>
+        </div>
+        <button class="btn btn-soft" id="icsBtn">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <rect x="3" y="5" width="18" height="16" rx="3"/><path d="M8 3v4M16 3v4M3 11h18"/></svg>
+          Criar lembrete semanal no calendário
+        </button>
+        <p class="note" style="margin-top:10px">Baixa um arquivo <b>.ics</b> — abra e o alarme semanal entra no calendário do celular, com aviso 30 min antes.</p>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-h"><div class="eyebrow">Seus dados</div><div class="line"></div></div>
+      <div class="card" style="padding:4px 15px">
+        <div class="row-sw">
+          <div class="t"><b>Exportar</b><span>salva tudo num arquivo .json</span></div>
+          <button class="btn btn-soft btn-sm" id="exportBtn">Baixar</button>
+        </div>
+        <div class="row-sw">
+          <div class="t"><b>Importar</b><span>junta um backup ao que já existe</span></div>
+          <button class="btn btn-soft btn-sm" id="importBtn">Escolher</button>
+          <input type="file" id="importFile" accept="application/json,.json" hidden>
+        </div>
+        <div class="row-sw">
+          <div class="t"><b>Apagar tudo</b><span>não tem como desfazer</span></div>
+          <button class="btn btn-danger btn-sm" id="wipeBtn">Apagar</button>
+        </div>
+      </div>
+      <p class="note" style="margin-top:10px" id="storageNote"></p>
+    </div>
+
+    <div class="section">
+      <div class="section-h"><div class="eyebrow">Instalar no celular</div><div class="line"></div></div>
+      <div class="card" style="padding:15px">
+        <p class="note" style="margin:0 0 8px"><b style="color:var(--ink)">iPhone:</b> abra no Safari → botão Compartilhar → <b style="color:var(--ink)">Adicionar à Tela de Início</b>.</p>
+        <p class="note" style="margin:0"><b style="color:var(--ink)">Android:</b> abra no Chrome → menu ⋮ → <b style="color:var(--ink)">Adicionar à tela inicial</b>.</p>
+      </div>
+    </div>
+
+    <p class="note" style="margin:26px 0 6px;text-align:center">
+      Pontual é um caderno de anotações, não um profissional de saúde.<br>
+      Dose, intervalo e local de aplicação são combinados com quem prescreve.
+    </p>
+  </section>
+</div>
+
+<!-- ======================= SHEET ======================= -->
+<div id="scrim" class="scrim" hidden></div>
+<div id="sheet" class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" hidden>
+  <div class="grab"></div>
+  <div id="sheetBody"></div>
+</div>
+
+<nav class="tabs">
+  <div class="inner">
+    <button data-tab="hoje" aria-selected="true">
+      <span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>Hoje</button>
+    <button data-tab="mapa" aria-selected="false">
+      <span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="5" r="2.4"/><path d="M12 8v8M12 16l-4 5M12 16l4 5M6 10h12"/></svg></span>Mapa</button>
+    <button data-tab="diario" aria-selected="false">
+      <span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M5 4h12a2 2 0 0 1 2 2v14H7a2 2 0 0 1-2-2V4Z"/><path d="M9 8h7M9 12h7M9 16h4"/></svg></span>Diário</button>
+    <button data-tab="ajustes" aria-selected="false">
+      <span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M18.4 5.6L17 7M7 17l-1.4 1.4"/></svg></span>Ajustes</button>
+  </div>
+</nav>
+
+<div id="toast"></div>
+
+<script>
+"use strict";
+/* =====================================================
+   1. ARMAZENAMENTO
+   ===================================================== */
+const KEY = "pontual.v1", AUTH_KEY = "pontual.auth.v1";
+const Store = (() => {
+  const ws = (typeof window !== "undefined" && window.storage && typeof window.storage.get === "function") ? window.storage : null;
+  const mem = {};
+  let mode = ws ? "sincronizado" : "neste aparelho";
+  async function get(k){
+    if (ws) { try { const r = await ws.get(k); return r ? JSON.parse(r.value) : null; } catch(e){ return null; } }
+    try { const raw = localStorage.getItem(k); return raw ? JSON.parse(raw) : null; }
+    catch(e){ mode = "só nesta sessão"; return mem[k] || null; }
+  }
+  async function set(k, d){
+    const s = JSON.stringify(d);
+    if (ws) { try { await ws.set(k, s); return; } catch(e){} }
+    try { localStorage.setItem(k, s); } catch(e){ mem[k] = d; mode = "só nesta sessão"; }
+  }
+  async function del(k){
+    delete mem[k];
+    if (ws) { try { await ws.delete(k); } catch(e){} return; }
+    try { localStorage.removeItem(k); } catch(e){}
+  }
+  return { mode(){ return mode; }, get, set, del, load(){ return get(KEY); }, save(d){ return set(KEY, d); } };
+})();
+
+/* =====================================================
+   2. DADOS
+   ===================================================== */
+/* Abdômen: 8 pontos em anel ao redor do umbigo (método do relógio),
+   numerados no sentido horário a partir do topo. O umbigo fica em (180,236)
+   e o anel guarda ~13 cm de distância dele. */
+const ZONES = [
+  { id:"abd-1", k:1, n:"Barriga 1 — acima do umbigo",  s:"Barriga 1", g:"Barriga", cx:180, cy:191, rx:14, ry:14 },
+  { id:"abd-2", k:2, n:"Barriga 2 — alto esquerdo",    s:"Barriga 2", g:"Barriga", cx:207, cy:204, rx:14, ry:14 },
+  { id:"abd-3", k:3, n:"Barriga 3 — lateral esquerda", s:"Barriga 3", g:"Barriga", cx:218, cy:236, rx:14, ry:14 },
+  { id:"abd-4", k:4, n:"Barriga 4 — baixo esquerdo",   s:"Barriga 4", g:"Barriga", cx:207, cy:268, rx:14, ry:14 },
+  { id:"abd-5", k:5, n:"Barriga 5 — abaixo do umbigo", s:"Barriga 5", g:"Barriga", cx:180, cy:281, rx:14, ry:14 },
+  { id:"abd-6", k:6, n:"Barriga 6 — baixo direito",    s:"Barriga 6", g:"Barriga", cx:153, cy:268, rx:14, ry:14 },
+  { id:"abd-7", k:7, n:"Barriga 7 — lateral direita",  s:"Barriga 7", g:"Barriga", cx:142, cy:236, rx:14, ry:14 },
+  { id:"abd-8", k:8, n:"Barriga 8 — alto direito",     s:"Barriga 8", g:"Barriga", cx:153, cy:204, rx:14, ry:14 },
+  { id:"cox-da", n:"Coxa direita — alta",   s:"Coxa dir. alta",  g:"Coxa",  cx:152, cy:370, rx:17, ry:22 },
+  { id:"cox-ea", n:"Coxa esquerda — alta",  s:"Coxa esq. alta",  g:"Coxa",  cx:208, cy:370, rx:17, ry:22 },
+  { id:"cox-dm", n:"Coxa direita — média",  s:"Coxa dir. média", g:"Coxa",  cx:151, cy:418, rx:17, ry:21 },
+  { id:"cox-em", n:"Coxa esquerda — média", s:"Coxa esq. média", g:"Coxa",  cx:209, cy:418, rx:17, ry:21 },
+  { id:"bra-d",  n:"Braço direito",         s:"Braço dir.",      g:"Braço", cx:112, cy:158, rx:11, ry:24 },
+  { id:"bra-e",  n:"Braço esquerdo",        s:"Braço esq.",      g:"Braço", cx:248, cy:158, rx:11, ry:24 }
+];
+/* geometria de elipse — usada pelo toque, pelo sorteio e pelo desenho */
+const inZone = (z,x,y,pad) => Math.hypot((x-z.cx)/(z.rx+(pad||0)), (y-z.cy)/(z.ry+(pad||0))) <= 1;
+function clampToZone(z,x,y){
+  const dx = (x-z.cx)/z.rx, dy = (y-z.cy)/z.ry, d = Math.hypot(dx,dy);
+  if (d <= .78 || d === 0) return { x, y };
+  const k = .78/d;
+  return { x: z.cx + dx*k*z.rx, y: z.cy + dy*k*z.ry };
+}
+function randomInZone(z){
+  const a = Math.random()*Math.PI*2, r = Math.sqrt(Math.random())*.62;
+  return { x: z.cx + Math.cos(a)*r*z.rx, y: z.cy + Math.sin(a)*r*z.ry };
+}
+const zoneById = id => ZONES.find(z => z.id === id);
+
+const DOSES = [2.5, 5, 7.5, 10, 12.5, 15];
+const FEELINGS = ["Tudo bem","Náusea","Enjoo","Azia","Dor no local","Vermelhidão","Hematoma","Cansaço","Intestino preso","Sem fome"];
+
+/* ajustes que viajam com a conta (o tema fica só em cada aparelho) */
+const SYNC_KEYS = ["dose","interval","pharmacy","lot","conc","val","weekday","hour"];
+const DEFAULTS = { dose:2.5, interval:7, pharmacy:"", lot:"", conc:"", val:"", weekday:4, hour:"21:00" };
+const freshDb = theme => ({
+  entries: [], weights: [],
+  tomb: { entries:{}, weights:{} },   // ids apagados: é o que leva a exclusão para os outros aparelhos
+  cloud: null,                        // conta a que este aparelho está ligado: { uid, email }
+  settings: Object.assign({}, DEFAULTS, { theme: theme || "auto", u: 0 })
+});
+let db = freshDb();
+function normalizeDb(saved){
+  const d = freshDb();
+  if (!saved || typeof saved !== "object") return d;
+  // registros de antes da nuvem não têm "u": a data da aplicação serve de marca inicial
+  const fix = r => (r && typeof r === "object" && typeof r.id === "string") ? (r.u ? r : Object.assign({}, r, { u: r.ts || 0 })) : null;
+  d.entries = (saved.entries || []).map(fix).filter(Boolean);
+  d.weights = (saved.weights || []).map(fix).filter(Boolean);
+  const t = saved.tomb || {};
+  d.tomb = { entries: Object.assign({}, t.entries), weights: Object.assign({}, t.weights) };
+  d.cloud = saved.cloud && saved.cloud.uid ? saved.cloud : null;
+  d.settings = Object.assign(d.settings, saved.settings || {});
+  return d;
+}
+/* assinatura dos ajustes que sincronizam: se mudou, a marca "u" sobe sozinha no persist() */
+const sigSettings = () => JSON.stringify(SYNC_KEYS.map(k => db.settings[k]));
+let settingsSig = sigSettings();
+const resetSig = () => { settingsSig = sigSettings(); };
+let view = "hoje";
+let selectedZone = null;
+let freshDotId = null;
+
+const uid = () => Math.random().toString(36).slice(2,10) + Date.now().toString(36);
+const DAY = 86400000;
+const sorted = () => db.entries.slice().sort((a,b) => b.ts - a.ts);
+const lastEntry = () => sorted()[0] || null;
+const usesOf = id => db.entries.filter(e => e.zoneId === id);
+const lastUse = id => { const u = usesOf(id); return u.length ? Math.max(...u.map(e => e.ts)) : null; };
+const daysAgo = ts => Math.floor((Date.now() - ts) / DAY);
+
+/* =====================================================
+   3. FORMATAÇÃO
+   ===================================================== */
+const fDay   = new Intl.DateTimeFormat("pt-BR",{ day:"2-digit" });
+const fMon   = new Intl.DateTimeFormat("pt-BR",{ month:"short" });
+const fFull  = new Intl.DateTimeFormat("pt-BR",{ weekday:"short", day:"numeric", month:"short" });
+const fTime  = new Intl.DateTimeFormat("pt-BR",{ hour:"2-digit", minute:"2-digit" });
+const fMonY  = new Intl.DateTimeFormat("pt-BR",{ month:"long", year:"numeric" });
+const fLong  = new Intl.DateTimeFormat("pt-BR",{ weekday:"long", day:"numeric", month:"long" });
+const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+const clean = s => String(s).replace(/\.$/,"");
+const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+
+function agoText(ts){
+  const d = daysAgo(ts);
+  if (d <= 0) return "hoje";
+  if (d === 1) return "ontem";
+  if (d < 14) return "há " + d + " dias";
+  const w = Math.floor(d / 7);
+  if (w < 9) return "há " + w + " semanas";
+  return "há " + Math.floor(d / 30) + " meses";
+}
+function toast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg; t.classList.add("on");
+  clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove("on"), 2400);
+}
+function buzz(ms){ if (navigator.vibrate) { try { navigator.vibrate(ms); } catch(e){} } }
+const localISO = d => new Date(d.getTime() - d.getTimezoneOffset()*60000).toISOString().slice(0,16);
+
+/* =====================================================
+   4. RODÍZIO
+   ===================================================== */
+function suggestZone(){
+  const last = lastEntry();
+  const scored = ZONES.map(z => ({ z, t: lastUse(z.id) || 0, n: usesOf(z.id).length }));
+  scored.sort((a,b) => (a.t - b.t) || (a.n - b.n));
+  let pick = scored[0];
+  if (last && pick.z.id === last.zoneId && scored[1]) pick = scored[1];
+  return pick.z;
+}
+function zoneAlpha(id){
+  const t = lastUse(id);
+  if (!t) return 0;
+  const d = daysAgo(t);
+  if (d < 7)  return .85;
+  if (d < 21) return .5;
+  if (d < 42) return .25;
+  return .12;
+}
+function nextDue(){
+  const last = lastEntry();
+  if (!last) return null;
+  return last.ts + db.settings.interval * DAY;
+}
+
+/* =====================================================
+   5. RENDER — HOJE
+   ===================================================== */
+function renderHoje(){
+  const due = nextDue(), last = lastEntry();
+  const ring = document.getElementById("ringFill");
+  const C = 2 * Math.PI * 34;
+
+  if (!due) {
+    document.getElementById("ringVal").textContent = "–";
+    ring.setAttribute("stroke-dashoffset", C);
+    document.getElementById("nextTitle").textContent = "Comece por aqui";
+    document.getElementById("nextSub").textContent = "Registre a primeira aplicação para o rodízio começar.";
+  } else {
+    const left = Math.ceil((due - Date.now()) / DAY);
+    const elapsed = Math.min(1, Math.max(0, (Date.now() - last.ts) / (db.settings.interval * DAY)));
+    ring.setAttribute("stroke-dashoffset", C * (1 - elapsed));
+    ring.setAttribute("stroke", left < 0 ? "var(--warn)" : (left <= 1 ? "var(--green)" : "var(--violet)"));
+    document.getElementById("ringVal").textContent = left < 0 ? "!" : left;
+
+    const t = document.getElementById("nextTitle"), s = document.getElementById("nextSub");
+    if (left < 0)       { t.textContent = "Atrasada"; s.textContent = Math.abs(left) + (Math.abs(left) === 1 ? " dia" : " dias") + " além do previsto — era " + cap(clean(fLong.format(due))) + "."; }
+    else if (left === 0){ t.textContent = "É hoje"; s.textContent = "Prevista para " + cap(clean(fLong.format(due))) + "."; }
+    else if (left === 1){ t.textContent = "Amanhã"; s.textContent = cap(clean(fLong.format(due))) + ", " + fTime.format(due) + "."; }
+    else                { t.textContent = "Faltam " + left + " dias"; s.textContent = cap(clean(fLong.format(due))) + "."; }
+  }
+
+  const sz = suggestZone(), lu = lastUse(sz.id);
+  document.getElementById("suggestName").textContent = sz.n;
+  document.getElementById("suggestWhy").textContent = lu
+    ? "É a área com mais tempo de descanso — última vez " + agoText(lu) + "."
+    : "Área ainda não usada no rodízio.";
+
+  // frasco
+  const st = db.settings;
+  const vial = document.getElementById("vialCard");
+  const fields = [
+    ["Dose", st.dose + " mg"],
+    ["Lote", st.lot || "—"],
+    ["Conc.", st.conc || "—"],
+    ["Val.", st.val ? new Date(st.val + "T12:00").toLocaleDateString("pt-BR") : "—"]
+  ];
+  vial.innerHTML =
+    '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">' +
+    fields.map(f => '<div><div class="eyebrow" style="margin-bottom:3px">' + f[0] + '</div>' +
+      '<div class="mono" style="font-size:12.5px;font-weight:600;word-break:break-word">' + esc(f[1]) + '</div></div>').join("") +
+    '</div>' + (st.pharmacy ? '<p class="note" style="margin:11px 0 0">' + esc(st.pharmacy) + '</p>' : '');
+
+  const rec = sorted().slice(0,3);
+  document.getElementById("recentList").innerHTML = rec.length
+    ? rec.map(entryRow).join("")
+    : '<div class="empty"><b>Nada registrado ainda</b><p>O primeiro registro monta o mapa.</p></div>';
+}
+
+function entryRow(e){
+  const z = zoneById(e.zoneId), d = new Date(e.ts);
+  return '<button class="entry" data-edit="' + e.id + '">' +
+    '<span class="d"><b>' + fDay.format(d) + '</b><small>' + clean(fMon.format(d)) + '</small></span>' +
+    '<span class="m"><b>' + esc(z ? z.n : "Local removido") + '</b>' +
+    '<small>' + fTime.format(d) + ' · ' + agoText(e.ts) + (e.lot ? ' · lote ' + esc(e.lot) : '') + '</small></span>' +
+    '<span class="dose">' + esc(e.dose) + ' mg</span></button>';
+}
+
+/* =====================================================
+   6. RENDER — MAPA
+   ===================================================== */
+function renderMapa(){
+  const zg = document.getElementById("zones");
+  const lg = document.getElementById("zoneLabels");
+  const dg = document.getElementById("dots");
+  const sug = suggestZone();
+
+  zg.innerHTML = ZONES.map(z => {
+    const a = zoneAlpha(z.id);
+    const isSug = z.id === sug.id;
+    const isSel = selectedZone === z.id;
+    return '<ellipse cx="' + z.cx + '" cy="' + z.cy + '" rx="' + z.rx + '" ry="' + z.ry +
+      '" fill="var(--card)"></ellipse>' +
+      '<ellipse class="zone" data-zone="' + z.id + '" cx="' + z.cx + '" cy="' + z.cy +
+      '" rx="' + z.rx + '" ry="' + z.ry + '" fill="' + (a ? 'rgba(var(--violet-rgb),' + a + ')' : 'var(--green-wash)') + '" ' +
+      'stroke="' + (isSug ? "var(--mark)" : (isSel ? "var(--ink)" : "var(--skin-line)")) + '" ' +
+      'stroke-width="' + (isSug || isSel ? 2.4 : 1.1) + '" ' +
+      (isSug ? 'stroke-dasharray="5 3"' : '') + '></ellipse>' +
+      (isSug ? '<ellipse class="suggest-ring" cx="' + z.cx + '" cy="' + z.cy + '" rx="' + (z.rx+4) +
+        '" ry="' + (z.ry+4) + '" fill="none" stroke="var(--mark)" stroke-width="2"></ellipse>' : '');
+  }).join("");
+
+  lg.innerHTML = ZONES.filter(z => z.k).map(z =>
+    '<text class="zone-label" x="' + z.cx + '" y="' + (z.cy + 3.4) + '" text-anchor="middle" ' +
+    'fill="' + (zoneAlpha(z.id) > .7 ? "var(--card)" : "var(--ink-2)") + '">' + z.k + '</text>').join("");
+
+  dg.innerHTML = sorted().slice(0, 60).map(e => {
+    const d = daysAgo(e.ts);
+    const op = Math.max(.14, 1 - d / 70);
+    const r = d < 7 ? 3.9 : 3.2;
+    const isNew = e.id === freshDotId;
+    return '<circle class="dot' + (isNew ? ' new' : '') + '" cx="' + e.x + '" cy="' + e.y + '" r="' + r +
+      '" fill="var(--violet)" opacity="' + op.toFixed(2) + '"></circle>' +
+      (d < 7 ? '<circle class="dot" cx="' + e.x + '" cy="' + e.y + '" r="7" fill="none" stroke="var(--violet)" stroke-width="1" opacity=".3"></circle>' : '');
+  }).join("");
+  freshDotId = null;
+
+  document.getElementById("rotGrid").innerHTML = ZONES
+    .map(z => ({ z, t: lastUse(z.id) }))
+    .sort((a,b) => (a.t || 0) - (b.t || 0))
+    .map(o => {
+      const d = o.t ? daysAgo(o.t) : null;
+      const pct = d === null ? 100 : Math.min(100, Math.round(d / 42 * 100));
+      const ready = d === null || d >= 28;
+      return '<button class="rot" data-jump="' + o.z.id + '" data-sug="' + (o.z.id === sug.id ? 1 : 0) + '">' +
+        '<b>' + esc(o.z.s) + '</b>' +
+        '<span class="bar"><i style="width:' + pct + '%;background:' + (ready ? "var(--green)" : "var(--violet)") + '"></i></span>' +
+        '<small>' + (d === null ? "nunca usada" : "descansa há " + d + "d") + '</small></button>';
+    }).join("");
+
+  const info = document.getElementById("zoneInfo");
+  if (selectedZone) {
+    const z = zoneById(selectedZone), u = usesOf(z.id), lu = lastUse(z.id);
+    info.hidden = false;
+    document.getElementById("ziName").textContent = z.n;
+    document.getElementById("ziMeta").textContent = lu
+      ? u.length + (u.length === 1 ? " aplicação" : " aplicações") + " · última " + agoText(lu)
+      : "Nunca usada";
+  } else info.hidden = true;
+}
+
+/* =====================================================
+   7. RENDER — DIÁRIO
+   ===================================================== */
+function renderDiario(){
+  const list = sorted();
+  const weeks = list.length ? Math.max(1, Math.round((Date.now() - list[list.length-1].ts) / (7*DAY)) + 1) : 0;
+  const counts = ZONES.map(z => ({ z, n: usesOf(z.id).length })).filter(x => x.n > 0).sort((a,b) => b.n - a.n);
+  const used = counts.length;
+
+  document.getElementById("statsGrid").innerHTML = [
+    ["<b>" + list.length + "</b>", "aplicações registradas"],
+    ["<b>" + weeks + "</b>", weeks === 1 ? "semana de tratamento" : "semanas de tratamento"],
+    ["<b>" + used + "<span style='font-size:14px;color:var(--muted)'>/" + ZONES.length + "</span></b>", "áreas já usadas"],
+    ["<b>" + (list[0] ? list[0].dose : db.settings.dose) + "<span style='font-size:14px;color:var(--muted)'> mg</span></b>", "dose mais recente"]
+  ].map(s => '<div class="stat">' + s[0] + '<span>' + s[1] + '</span></div>').join("");
+
+  // peso
+  const w = db.weights.slice().sort((a,b) => a.ts - b.ts);
+  const wc = document.getElementById("weightCard");
+  if (!w.length) {
+    wc.innerHTML = '<p class="note" style="margin:0">Nenhuma anotação ainda. Opcional — some se for útil pra você.</p>';
+  } else {
+    const first = w[0].kg, last = w[w.length-1].kg, diff = last - first;
+    const vals = w.map(p => p.kg), mn = Math.min(...vals), mx = Math.max(...vals), span = (mx - mn) || 1;
+    const pts = w.map((p,i) => (w.length === 1 ? 50 : (i/(w.length-1))*100).toFixed(1) + "," + (38 - ((p.kg-mn)/span)*32).toFixed(1)).join(" ");
+    wc.innerHTML =
+      '<div style="display:flex;align-items:baseline;gap:10px;margin-bottom:8px">' +
+      '<div class="display" style="font-size:29px">' + last.toFixed(1).replace(".",",") + '<span style="font-size:14px;color:var(--muted)"> kg</span></div>' +
+      '<div class="mono" style="font-size:11px;color:' + (diff <= 0 ? "var(--green)" : "var(--ink-2)") + '">' +
+      (diff > 0 ? "+" : "") + diff.toFixed(1).replace(".",",") + ' kg desde o início</div></div>' +
+      '<svg class="spark" viewBox="0 0 100 44" preserveAspectRatio="none">' +
+      '<polyline points="' + pts + '" fill="none" stroke="var(--violet)" stroke-width="1.6" vector-effect="non-scaling-stroke" stroke-linejoin="round"/>' +
+      '</svg>' +
+      '<div class="eyebrow" style="margin-top:4px">' + w.length + ' anotações · desde ' + clean(fFull.format(w[0].ts)) + '</div>';
+  }
+
+  // histórico
+  const hl = document.getElementById("historyList");
+  if (!list.length) {
+    hl.innerHTML = '<div class="empty"><b>Histórico vazio</b><p>Cada registro entra aqui com data, local, dose e lote.</p></div>';
+    return;
+  }
+  let html = "", curMonth = "";
+  list.forEach(e => {
+    const m = cap(fMonY.format(new Date(e.ts)));
+    if (m !== curMonth) { curMonth = m; html += '<div class="month-h">' + m + '</div>'; }
+    html += entryRow(e);
+  });
+  hl.innerHTML = html;
+}
+
+/* =====================================================
+   8. RENDER — AJUSTES
+   ===================================================== */
+function renderAjustes(){
+  document.getElementById("doseChips").innerHTML = DOSES.map(d =>
+    '<button class="chip v" data-dose="' + d + '" aria-pressed="' + (db.settings.dose == d) + '">' +
+    String(d).replace(".",",") + ' mg</button>').join("");
+  document.getElementById("intervalChips").innerHTML = [5,7,10,14].map(d =>
+    '<button class="chip" data-interval="' + d + '" aria-pressed="' + (db.settings.interval == d) + '">' +
+    d + ' dias</button>').join("");
+  const setVal = (id, v) => { const el = document.getElementById(id); if (el && document.activeElement !== el) el.value = v; };
+  setVal("setPharm", db.settings.pharmacy || "");
+  setVal("setLot", db.settings.lot || "");
+  setVal("setConc", db.settings.conc || "");
+  setVal("setVal", db.settings.val || "");
+  setVal("setWeekday", db.settings.weekday);
+  setVal("setHour", db.settings.hour || "21:00");
+  renderAcct();
+  document.getElementById("storageNote").textContent = Cloud.signedIn()
+    ? "Seus registros ficam neste aparelho e numa cópia privada na sua conta (Google Firebase). Só você consegue ler."
+    : "Tudo fica guardado " + Store.mode() + ". Nada é enviado para servidor nenhum.";
+}
+
+function render(){
+  ["hoje","mapa","diario","ajustes"].forEach(v =>
+    document.getElementById("view-" + v).hidden = (v !== view));
+  document.querySelectorAll("nav.tabs button").forEach(b =>
+    b.setAttribute("aria-selected", b.dataset.tab === view));
+  if (view === "hoje") renderHoje();
+  if (view === "mapa") renderMapa();
+  if (view === "diario") renderDiario();
+  if (view === "ajustes") renderAjustes();
+}
+async function persist(opts){
+  const s = sigSettings();
+  if (s !== settingsSig) { db.settings.u = Date.now(); settingsSig = s; }   // ajuste mudou: marca a hora
+  await Store.save(db);
+  if (!(opts && opts.local)) Cloud.queue();
+}
+/* apagou: guarda o marcador para a exclusão chegar nos outros aparelhos (só se há conta ligada) */
+function markDeleted(kind, id){ if (Cloud.signedIn() || db.cloud) db.tomb[kind][id] = Date.now(); }
+
+/* =====================================================
+   9. SHEET
+   ===================================================== */
+let sheetTimer = null;
+function openSheet(html){
+  clearTimeout(sheetTimer);
+  document.getElementById("sheetBody").innerHTML = html;
+  document.getElementById("scrim").hidden = false;
+  document.getElementById("sheet").hidden = false;
+  requestAnimationFrame(() => document.body.classList.add("sheet-open"));
+}
+function closeSheet(){
+  document.body.classList.remove("sheet-open");
+  clearTimeout(sheetTimer);
+  sheetTimer = setTimeout(() => {
+    document.getElementById("scrim").hidden = true;
+    document.getElementById("sheet").hidden = true;
+    document.getElementById("sheetBody").innerHTML = "";
+  }, 280);
+}
+document.getElementById("scrim").addEventListener("click", closeSheet);
+
+function entryForm(entry, zoneId, pos){
+  const isEdit = !!entry;
+  const z = zoneById(isEdit ? entry.zoneId : zoneId) || suggestZone();
+  const when = isEdit ? new Date(entry.ts) : new Date();
+  const dose = isEdit ? entry.dose : db.settings.dose;
+  const feels = isEdit ? (entry.feelings || []) : [];
+
+  return '<h2 id="sheetTitle">' + (isEdit ? "Editar aplicação" : "Registrar aplicação") + '</h2>' +
+  '<p class="sub">' + (isEdit ? "Ajuste o que precisar." : "Confira o local e salve.") + '</p>' +
+
+  '<div class="field"><label class="eyebrow">Local</label>' +
+  '<select id="fZone">' + ZONES.map(o =>
+    '<option value="' + o.id + '"' + (o.id === z.id ? " selected" : "") + '>' + o.n + '</option>').join("") +
+  '</select></div>' +
+
+  '<div class="field"><label class="eyebrow">Data e hora</label>' +
+  '<input type="datetime-local" id="fWhen" value="' + localISO(when) + '"></div>' +
+
+  '<div class="field"><label class="eyebrow">Dose</label>' +
+  '<div class="chips" id="fDoses">' + DOSES.map(d =>
+    '<button class="chip v" data-d="' + d + '" aria-pressed="' + (d == dose) + '">' +
+    String(d).replace(".",",") + ' mg</button>').join("") + '</div></div>' +
+
+  '<div class="two">' +
+  '<div class="field"><label class="eyebrow">Lote</label>' +
+  '<input type="text" id="fLot" maxlength="60" value="' + esc(isEdit ? (entry.lot||"") : (db.settings.lot||"")) + '" placeholder="000000"></div>' +
+  '<div class="field"><label class="eyebrow">Concentração</label>' +
+  '<input type="text" id="fConc" maxlength="60" value="' + esc(isEdit ? (entry.conc||"") : (db.settings.conc||"")) + '" placeholder="mg/mL"></div>' +
+  '</div>' +
+
+  '<div class="field"><label class="eyebrow">Como você ficou</label>' +
+  '<div class="chips" id="fFeel">' + FEELINGS.map(f =>
+    '<button class="chip" data-f="' + f + '" aria-pressed="' + feels.includes(f) + '">' + f + '</button>').join("") +
+  '</div></div>' +
+
+  '<div class="field"><label class="eyebrow">Observações</label>' +
+  '<textarea id="fNote" maxlength="1000" placeholder="Qualquer coisa que valha lembrar na próxima.">' + esc(isEdit ? (entry.note||"") : "") + '</textarea></div>' +
+
+  '<div class="sheet-actions">' +
+  (isEdit ? '<button class="btn btn-danger" id="fDel">Excluir</button>' : '<button class="btn btn-ghost" id="fCancel">Cancelar</button>') +
+  '<button class="btn btn-primary" id="fSave" data-id="' + (isEdit ? entry.id : "") + '" ' +
+  'data-x="' + (pos ? pos.x : (isEdit ? entry.x : "")) + '" data-y="' + (pos ? pos.y : (isEdit ? entry.y : "")) + '">Salvar</button>' +
+  '</div>';
+}
+
+function openEntry(entry, zoneId, pos){
+  openSheet(entryForm(entry, zoneId, pos));
+  const body = document.getElementById("sheetBody");
+
+  body.querySelector("#fDoses").addEventListener("click", ev => {
+    const b = ev.target.closest("[data-d]"); if (!b) return;
+    body.querySelectorAll("#fDoses .chip").forEach(c => c.setAttribute("aria-pressed","false"));
+    b.setAttribute("aria-pressed","true");
+  });
+  body.querySelector("#fFeel").addEventListener("click", ev => {
+    const b = ev.target.closest("[data-f]"); if (!b) return;
+    b.setAttribute("aria-pressed", b.getAttribute("aria-pressed") === "true" ? "false" : "true");
+  });
+  const cancel = body.querySelector("#fCancel"); if (cancel) cancel.addEventListener("click", closeSheet);
+  const del = body.querySelector("#fDel");
+  if (del) del.addEventListener("click", async () => {
+    db.entries = db.entries.filter(e => e.id !== entry.id);
+    markDeleted("entries", entry.id);
+    await persist(); closeSheet(); render(); toast("Aplicação excluída");
+  });
+
+  body.querySelector("#fSave").addEventListener("click", async ev => {
+    const btn = ev.currentTarget;
+    const zid = body.querySelector("#fZone").value;
+    const z = zoneById(zid);
+    const whenVal = body.querySelector("#fWhen").value;
+    const ts = whenVal ? new Date(whenVal).getTime() : Date.now();
+    const dEl = body.querySelector('#fDoses [aria-pressed="true"]');
+    const feelings = Array.from(body.querySelectorAll('#fFeel [aria-pressed="true"]')).map(b => b.dataset.f);
+    const lot = body.querySelector("#fLot").value.trim();
+    const conc = body.querySelector("#fConc").value.trim();
+
+    let x = parseFloat(btn.dataset.x), y = parseFloat(btn.dataset.y);
+    if (isNaN(x) || isNaN(y) || !inZone(z, x, y, 1)) { const p = randomInZone(z); x = p.x; y = p.y; }
+    else { const p = clampToZone(z, x, y); x = p.x; y = p.y; }
+
+    const rec = {
+      id: btn.dataset.id || uid(), ts, zoneId: zid,
+      x: +x.toFixed(1), y: +y.toFixed(1),
+      dose: dEl ? parseFloat(dEl.dataset.d) : db.settings.dose,
+      lot, conc, feelings, note: body.querySelector("#fNote").value.trim(), u: Date.now()
+    };
+
+    if (btn.dataset.id && db.entries.some(e => e.id === rec.id)) db.entries = db.entries.map(e => e.id === rec.id ? rec : e);
+    else db.entries.push(rec);
+    delete db.tomb.entries[rec.id];
+
+    db.settings.dose = rec.dose;
+    if (lot) db.settings.lot = lot;
+    if (conc) db.settings.conc = conc;
+
+    freshDotId = rec.id;
+    await persist();
+    closeSheet(); buzz(14);
+    selectedZone = zid;
+    view = "mapa"; render();
+    toast(btn.dataset.id ? "Aplicação atualizada" : "Registrado em " + z.n.toLowerCase());
+  });
+}
+
+function openWeight(){
+  const last = db.weights.slice().sort((a,b) => b.ts - a.ts)[0];
+  openSheet(
+    '<h2 id="sheetTitle">Anotar peso</h2><p class="sub">Opcional, e só pra você acompanhar.</p>' +
+    '<div class="two"><div class="field"><label class="eyebrow">Peso (kg)</label>' +
+    '<input type="number" step="0.1" inputmode="decimal" id="wKg" placeholder="' + (last ? last.kg : "00,0") + '"></div>' +
+    '<div class="field"><label class="eyebrow">Data</label>' +
+    '<input type="datetime-local" id="wWhen" value="' + localISO(new Date()) + '"></div></div>' +
+    (db.weights.length ? '<button class="btn btn-danger btn-sm" id="wClear" style="width:100%;margin-bottom:12px">Apagar todas as anotações de peso</button>' : '') +
+    '<div class="sheet-actions"><button class="btn btn-ghost" id="wCancel">Cancelar</button>' +
+    '<button class="btn btn-primary" id="wSave">Salvar</button></div>'
+  );
+  const b = document.getElementById("sheetBody");
+  b.querySelector("#wCancel").addEventListener("click", closeSheet);
+  const cl = b.querySelector("#wClear");
+  if (cl) cl.addEventListener("click", async () => {
+    db.weights.forEach(w => markDeleted("weights", w.id));
+    db.weights = []; await persist(); closeSheet(); render(); toast("Anotações de peso apagadas");
+  });
+  b.querySelector("#wSave").addEventListener("click", async () => {
+    const kg = parseFloat(String(b.querySelector("#wKg").value).replace(",","."));
+    if (!kg || kg < 20 || kg > 400) { toast("Informe um peso entre 20 e 400 kg"); return; }
+    const w = b.querySelector("#wWhen").value;
+    db.weights.push({ id: uid(), ts: w ? new Date(w).getTime() : Date.now(), kg: +kg.toFixed(1), u: Date.now() });
+    await persist(); closeSheet(); render(); toast("Peso anotado");
+  });
+}
+
+/* =====================================================
+   10. EVENTOS
+   ===================================================== */
+document.querySelector("nav.tabs").addEventListener("click", ev => {
+  const b = ev.target.closest("[data-tab]"); if (!b) return;
+  view = b.dataset.tab; selectedZone = null; render();
+  window.scrollTo({ top:0, behavior:"instant" in window ? "instant" : "auto" });
+});
+
+document.getElementById("quickAdd").addEventListener("click", () => openEntry(null, suggestZone().id, null));
+
+document.getElementById("bodyMap").addEventListener("click", ev => {
+  const svg = ev.currentTarget, r = svg.getBoundingClientRect(), vb = svg.viewBox.baseVal;
+  const x = (ev.clientX - r.left) / r.width * vb.width;
+  const y = (ev.clientY - r.top) / r.height * vb.height;
+  let hit = ZONES.find(z => inZone(z, x, y, 3));
+  if (!hit) {
+    let best = null, bd = 22;
+    ZONES.forEach(z => {
+      const d = Math.hypot(x - z.cx, y - z.cy) - Math.max(z.rx, z.ry);
+      if (d < bd) { bd = d; best = z; }
+    });
+    hit = best;
+  }
+  if (!hit) { selectedZone = null; renderMapa(); return; }
+  svg._pos = clampToZone(hit, x, y);
+  selectedZone = hit.id; buzz(8); renderMapa();
+});
+
+document.getElementById("ziAdd").addEventListener("click", () => {
+  if (!selectedZone) return;
+  openEntry(null, selectedZone, document.getElementById("bodyMap")._pos || null);
+});
+
+document.body.addEventListener("click", ev => {
+  const b = ev.target.closest("[data-edit]");
+  if (b) { const e = db.entries.find(x => x.id === b.dataset.edit); if (e) openEntry(e, null, null); return; }
+  const j = ev.target.closest("[data-jump]");
+  if (j) {
+    selectedZone = j.dataset.jump;
+    document.getElementById("bodyMap")._pos = null;
+    renderMapa(); buzz(8);
+    document.getElementById("zoneInfo").scrollIntoView({ behavior:"smooth", block:"center" });
+  }
+});
+
+document.getElementById("addWeight").addEventListener("click", openWeight);
+
+// ajustes
+document.getElementById("view-ajustes").addEventListener("click", async ev => {
+  const d = ev.target.closest("[data-dose]");
+  if (d) { db.settings.dose = parseFloat(d.dataset.dose); await persist(); renderAjustes(); return; }
+  const i = ev.target.closest("[data-interval]");
+  if (i) { db.settings.interval = parseInt(i.dataset.interval,10); await persist(); renderAjustes(); return; }
+});
+["setPharm","setLot","setConc","setVal","setWeekday","setHour"].forEach(id => {
+  document.addEventListener("change", async ev => {
+    if (ev.target.id !== id) return;
+    const map = { setPharm:"pharmacy", setLot:"lot", setConc:"conc", setVal:"val", setWeekday:"weekday", setHour:"hour" };
+    db.settings[map[id]] = ev.target.value;
+    await persist();
+  });
+});
+
+// tema
+function applyTheme(){
+  const t = db.settings.theme;
+  if (t === "auto") document.documentElement.removeAttribute("data-theme");
+  else document.documentElement.setAttribute("data-theme", t);
+}
+document.getElementById("themeBtn").addEventListener("click", async () => {
+  const order = ["auto","light","dark"];
+  const cur = order.indexOf(db.settings.theme || "auto");
+  db.settings.theme = order[(cur+1) % 3];
+  applyTheme(); await persist({ local:true });
+  toast({ auto:"Tema: automático", light:"Tema: claro", dark:"Tema: escuro" }[db.settings.theme]);
+});
+
+/* ---------- calendário .ics ---------- */
+document.getElementById("icsBtn").addEventListener("click", () => {
+  const [hh, mm] = (db.settings.hour || "21:00").split(":").map(n => parseInt(n,10) || 0);
+  const now = new Date(); const target = parseInt(db.settings.weekday,10);
+  const d = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hh, mm, 0);
+  let delta = (target - d.getDay() + 7) % 7;
+  if (delta === 0 && d <= now) delta = 7;
+  d.setDate(d.getDate() + delta);
+  const z = n => String(n).padStart(2,"0");
+  const local = dt => dt.getFullYear() + z(dt.getMonth()+1) + z(dt.getDate()) + "T" + z(dt.getHours()) + z(dt.getMinutes()) + "00";
+  const utc = dt => dt.toISOString().replace(/[-:]/g,"").split(".")[0] + "Z";
+  const ics = [
+    "BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Pontual//PT-BR//","CALSCALE:GREGORIAN",
+    "BEGIN:VEVENT","UID:" + uid() + "@pontual","DTSTAMP:" + utc(new Date()),
+    "DTSTART:" + local(d), "DURATION:PT10M", "RRULE:FREQ=WEEKLY;INTERVAL=1",
+    "SUMMARY:Aplicação semanal",
+    "DESCRIPTION:Confira o local sugerido no Pontual antes de aplicar.",
+    "BEGIN:VALARM","TRIGGER:-PT30M","ACTION:DISPLAY","DESCRIPTION:Aplicação em 30 minutos","END:VALARM",
+    "END:VEVENT","END:VCALENDAR"
+  ].join("\r\n");
+  download(new Blob([ics], { type:"text/calendar;charset=utf-8" }), "pontual-lembrete.ics");
+  toast("Lembrete gerado — abra o arquivo");
+});
+
+function download(blob, name){
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = name; document.body.appendChild(a); a.click();
+  setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 800);
+}
+
+document.getElementById("exportBtn").addEventListener("click", () => {
+  download(new Blob([JSON.stringify({ app:"pontual", v:2, entries:db.entries, weights:db.weights, settings:db.settings }, null, 2)], { type:"application/json" }),
+    "pontual-" + new Date().toISOString().slice(0,10) + ".json");
+  toast("Backup baixado");
+});
+document.getElementById("importBtn").addEventListener("click", () => document.getElementById("importFile").click());
+document.getElementById("importFile").addEventListener("change", ev => {
+  const f = ev.target.files[0]; if (!f) return;
+  const rd = new FileReader();
+  rd.onload = async () => {
+    try {
+      const d = JSON.parse(rd.result);
+      if (!d || !Array.isArray(d.entries)) throw new Error("formato");
+      // junta ao que já existe: o que já está aqui e é mais novo fica; o que faltava (ou foi apagado) volta
+      const now = Date.now(); let added = 0;
+      const take = (list, key, ok) => (Array.isArray(list) ? list : []).forEach(r => {
+        if (!r || typeof r !== "object" || !ok(r)) return;
+        const id = (typeof r.id === "string" && /^[A-Za-z0-9_-]{1,40}$/.test(r.id)) ? r.id : uid();
+        const cur = db[key].find(x => x.id === id);
+        if (cur && up(cur) >= up(r)) return;
+        db[key] = db[key].filter(x => x.id !== id).concat(Object.assign({}, r, { id, u: now }));
+        delete db.tomb[key][id];
+        added++;
+      });
+      take(d.entries, "entries", r => num(r.ts) && typeof r.zoneId === "string");
+      take(d.weights, "weights", r => num(r.ts) && num(r.kg) > 10 && num(r.kg) < 500);
+      if (d.settings && typeof d.settings === "object") SYNC_KEYS.forEach(k => { if (k in d.settings) db.settings[k] = d.settings[k]; });
+      await persist(); applyTheme(); render();
+      toast(added ? "Backup juntado · " + added + (added === 1 ? " registro novo" : " registros novos") : "Backup lido · nada novo para juntar");
+    } catch(e){ toast("Arquivo não reconhecido — use um backup do Pontual"); }
+  };
+  rd.readAsText(f);
+  ev.target.value = "";
+});
+document.getElementById("wipeBtn").addEventListener("click", () => {
+  const on = Cloud.signedIn();
+  openSheet('<h2 id="sheetTitle">Apagar tudo?</h2>' +
+    '<p class="sub">' + (on
+      ? 'Todas as aplicações, pesos e ajustes somem deste aparelho <b>e da sua conta na nuvem</b>, em todos os aparelhos. Não dá pra desfazer. Para limpar só este aparelho, use Sair em Conta e nuvem.'
+      : 'Todas as aplicações, pesos e ajustes somem deste aparelho. Não dá pra desfazer.') + '</p>' +
+    '<div class="sheet-actions"><button class="btn btn-ghost" id="noWipe">Manter</button>' +
+    '<button class="btn btn-danger" id="yesWipe">Apagar tudo</button></div>');
+  document.getElementById("noWipe").addEventListener("click", closeSheet);
+  document.getElementById("yesWipe").addEventListener("click", async () => {
+    const keepCloud = Cloud.signedIn(), now = Date.now();
+    if (keepCloud) { db.entries.forEach(e => { db.tomb.entries[e.id] = now; }); db.weights.forEach(w => { db.tomb.weights[w.id] = now; }); }
+    db.entries = []; db.weights = [];
+    if (!keepCloud) db.tomb = { entries:{}, weights:{} };
+    db.settings = Object.assign({}, DEFAULTS, { theme: db.settings.theme, u: keepCloud ? now : 0 });
+    resetSig();
+    await persist(); closeSheet(); view = "hoje"; render(); toast("Tudo apagado");
+  });
+});
+
+/* =====================================================
+   11. NUVEM — conta por e-mail e senha + sincronização
+   Dados em  pontual/usuarios/<uid>/{entries,weights,settings}.
+   Cada registro leva "u" (hora da última alteração). A sincronização
+   nunca sobrescreve às cegas: junta os dois lados e, em cada registro,
+   vale a alteração mais recente. Exclusões viram marcadores {del,u}.
+   ===================================================== */
+const SESSION_DEAD = new Set(["INVALID_REFRESH_TOKEN","TOKEN_EXPIRED","USER_DISABLED","USER_NOT_FOUND","MISSING_REFRESH_TOKEN","INVALID_GRANT_TYPE"]);
+class CloudError extends Error { constructor(code){ super(code); this.code = code; } }
+
+const num = v => (typeof v === "number" && isFinite(v)) ? v : 0;
+const up  = r => num(r && r.u) || num(r && r.ts);
+const cut = (v, n) => (typeof v === "string" ? v : (v == null ? "" : String(v))).slice(0, n);
+const arr = v => Array.isArray(v) ? v : (v && typeof v === "object" ? Object.keys(v).sort((a,b) => a - b).map(k => v[k]) : []);
+
+/* ---------- registro <-> nuvem ---------- */
+function entryOut(e){
+  const o = { u: up(e), ts: e.ts, zoneId: cut(e.zoneId, 24), x: num(e.x), y: num(e.y), dose: num(e.dose) || DEFAULTS.dose,
+              lot: cut(e.lot, 60), conc: cut(e.conc, 60), note: cut(e.note, 1000) };
+  const f = arr(e.feelings).filter(x => typeof x === "string").slice(0, 12);
+  if (f.length) o.feelings = f;      // a nuvem não guarda lista vazia
+  return o;
+}
+function entryIn(id, r){
+  if (!r || typeof r !== "object" || r.del === true) return null;
+  const ts = num(r.ts);
+  if (!ts || typeof r.zoneId !== "string") return null;
+  let x = num(r.x), y = num(r.y);
+  const z = zoneById(r.zoneId);
+  if (z && (!x || !y)) { const p = randomInZone(z); x = +p.x.toFixed(1); y = +p.y.toFixed(1); }
+  return {
+    id, ts, zoneId: r.zoneId.slice(0, 24), x, y, dose: num(r.dose) || DEFAULTS.dose,
+    lot: cut(r.lot, 60), conc: cut(r.conc, 60),
+    feelings: arr(r.feelings).filter(f => typeof f === "string").slice(0, 12),
+    note: cut(r.note, 1000), u: up(r)
+  };
+}
+const weightOut = w => ({ u: up(w), ts: w.ts, kg: w.kg });
+function weightIn(id, r){
+  if (!r || typeof r !== "object" || r.del === true) return null;
+  const ts = num(r.ts), kg = num(r.kg);
+  if (!ts || !(kg > 10 && kg < 500)) return null;
+  return { id, ts, kg, u: up(r) };
+}
+
+/* ---------- junta uma coleção (aplicações ou pesos) ---------- */
+function mergeSet(local, tomb, remote, toIn, toOut){
+  const byId = new Map(local.map(r => [r.id, r]));
+  const rem = (remote && typeof remote === "object") ? remote : {};
+  const push = {};
+  let got = 0, removed = 0;
+  for (const id of Object.keys(rem)) {
+    const r = rem[id];
+    if (!r || typeof r !== "object") continue;
+    const ru = up(r), l = byId.get(id), lt = tomb[id] || 0;
+    if (r.del === true) {
+      if (l && up(l) > ru) push[id] = toOut(l);                       // editei aqui depois de apagarem lá
+      else { if (l) { byId.delete(id); removed++; } if (lt < ru) tomb[id] = ru; }
+    } else if (lt && lt >= ru) {
+      push[id] = { del:true, u:lt };                                   // apaguei aqui depois da versão que está lá
+    } else {
+      const inc = toIn(id, r);
+      if (!inc) continue;
+      if (!l) { byId.set(id, inc); got++; delete tomb[id]; }
+      else if (inc.u > up(l)) { byId.set(id, inc); got++; }
+      else if (inc.u < up(l)) push[id] = toOut(l);
+    }
+  }
+  for (const [id, l] of byId) if (!(id in rem)) push[id] = toOut(l);
+  for (const id of Object.keys(tomb)) if (!(id in rem)) push[id] = { del:true, u:tomb[id] };
+  return { list: Array.from(byId.values()), push, got, removed };
+}
+
+/* ---------- ajustes (um bloco só; vale o mais recente) ---------- */
+const isDefaultSettings = () => SYNC_KEYS.every(k => String(db.settings[k]) === String(DEFAULTS[k]));
+const settingsOut = () => ({
+  u: num(db.settings.u),
+  dose: num(db.settings.dose) || DEFAULTS.dose, interval: num(db.settings.interval) || DEFAULTS.interval,
+  pharmacy: cut(db.settings.pharmacy, 80), lot: cut(db.settings.lot, 60), conc: cut(db.settings.conc, 60),
+  val: cut(db.settings.val, 12), weekday: cut(db.settings.weekday, 2), hour: cut(db.settings.hour, 8)
+});
+function applyRemoteSettings(r){
+  const s = db.settings;
+  if (num(r.dose)) s.dose = r.dose;
+  if (num(r.interval)) s.interval = r.interval;
+  ["pharmacy","lot","conc","val","hour"].forEach(k => { if (typeof r[k] === "string") s[k] = r[k]; });
+  if (r.weekday != null && r.weekday !== "") s.weekday = cut(r.weekday, 2);
+  s.u = num(r.u);
+  resetSig();
+}
+function mergeSettings(remote){
+  const lu = num(db.settings.u);
+  if (remote && typeof remote === "object" && num(remote.u)) {
+    const ru = num(remote.u);
+    if (ru > lu) { applyRemoteSettings(remote); return { push:null, pulled:true }; }
+    if (ru < lu) return { push:settingsOut(), pulled:false };
+    return { push:null, pulled:false };
+  }
+  if (lu) return { push:settingsOut(), pulled:false };
+  // nada na nuvem e nunca mexi nos ajustes depois da conta: só envio se forem ajustes de verdade (de antes da conta)
+  if (!isDefaultSettings()) { db.settings.u = Date.now(); resetSig(); return { push:settingsOut(), pulled:false }; }
+  return { push:null, pulled:false };
+}
+const syncMsg = c => c === "DENIED" ? "o banco recusou os dados (atualize o app)."
+  : /^HTTP_5/.test(c) ? "servidor indisponível, tente já já." : "erro " + c + ".";
+
+/* ---------- conta + rede ---------- */
+const Cloud = (() => {
+  const cfg = window.PONTUAL_NUVEM || {};
+  const enabled = !!(cfg.chave && cfg.banco);
+  const base = String(cfg.banco || "").replace(/\/+$/, "");
+  const st = { s:"off", last:0, msg:"" };          // s: off | ok | sync | err | offline
+  let sess = null, busy = false, again = false, timer = null;
+  const setState = (s, extra) => { st.s = s; if (extra) Object.assign(st, extra); paintCloud(); };
+  const codeOf = (j, r) => String((j && j.error && j.error.message) || "").split(/[\s:]/)[0] || ("HTTP_" + r.status);
+
+  async function idCall(method, body){
+    let r;
+    try {
+      r = await fetch("https://identitytoolkit.googleapis.com/v1/accounts:" + method + "?key=" + encodeURIComponent(cfg.chave), {
+        method:"POST",
+        headers:{ "Content-Type":"application/json", "X-Firebase-Locale":"pt-BR" },
+        body: JSON.stringify(body)
+      });
+    } catch(e){ throw new CloudError("NETWORK"); }
+    let j = null; try { j = await r.json(); } catch(e){}
+    if (!r.ok) throw new CloudError(codeOf(j, r));
+    return j;
+  }
+  const keep = () => Store.set(AUTH_KEY, sess);
+  async function adopt(j, email){
+    sess = { uid:j.localId, email:j.email || email, refresh:j.refreshToken, id:j.idToken,
+             exp: Date.now() + (parseInt(j.expiresIn, 10) || 3600) * 1000 };
+    await keep();
+    setState("ok", { last:0, msg:"" });
+    return sess;
+  }
+  async function refresh(){
+    const s = sess;
+    let r;
+    try {
+      r = await fetch("https://securetoken.googleapis.com/v1/token?key=" + encodeURIComponent(cfg.chave), {
+        method:"POST",
+        headers:{ "Content-Type":"application/x-www-form-urlencoded" },
+        body:"grant_type=refresh_token&refresh_token=" + encodeURIComponent(s.refresh)
+      });
+    } catch(e){ throw new CloudError("NETWORK"); }
+    let j = null; try { j = await r.json(); } catch(e){}
+    if (!r.ok) throw new CloudError(codeOf(j, r));
+    if (sess !== s) throw new CloudError("SIGNED_OUT");
+    s.id = j.id_token; s.refresh = j.refresh_token || s.refresh;
+    s.exp = Date.now() + (parseInt(j.expires_in, 10) || 3600) * 1000;
+    await keep();
+  }
+  async function token(force){
+    if (!sess) throw new CloudError("SIGNED_OUT");
+    if (force || Date.now() > sess.exp - 90000) await refresh();
+    if (!sess) throw new CloudError("SIGNED_OUT");
+    return sess.id;
+  }
+  async function call(method, sub, body, retried){
+    const tok = await token(retried === true);
+    const s = sess; if (!s) throw new CloudError("SIGNED_OUT");
+    const url = base + "/pontual/usuarios/" + s.uid + (sub ? "/" + sub : "") + ".json?auth=" + encodeURIComponent(tok);
+    let r;
+    try {
+      r = await fetch(url, body === undefined ? { method } : { method, headers:{ "Content-Type":"application/json" }, body: JSON.stringify(body) });
+    } catch(e){ throw new CloudError("NETWORK"); }
+    if (r.status === 401 && retried !== true) return call(method, sub, body, true);   // token velho: renova e tenta uma vez
+    if (!r.ok) throw new CloudError(r.status === 401 ? "DENIED" : "HTTP_" + r.status);
+    return r.json();
+  }
+
+  function queue(ms){
+    if (!sess) return;
+    clearTimeout(timer);
+    timer = setTimeout(() => sync("auto"), ms == null ? 900 : ms);
+  }
+
+  async function sync(why){
+    if (!sess) return null;
+    if (busy) { again = true; return null; }
+    busy = true; clearTimeout(timer);
+    setState("sync");
+    try {
+      const remote = await call("GET", "");
+      const R = (remote && typeof remote === "object") ? remote : {};
+      const e = mergeSet(db.entries, db.tomb.entries, R.entries, entryIn, entryOut);
+      const w = mergeSet(db.weights, db.tomb.weights, R.weights, weightIn, weightOut);
+      const s = mergeSettings(R.settings);
+      db.entries = e.list; db.weights = w.list;
+      db.cloud = { uid: sess.uid, email: sess.email };
+      await Store.save(db);
+      if (e.got + e.removed + w.got + w.removed > 0 || s.pulled) render();
+      if (Object.keys(e.push).length) await call("PATCH", "entries", e.push);
+      if (Object.keys(w.push).length) await call("PATCH", "weights", w.push);
+      if (s.push) await call("PUT", "settings", s.push);
+      setState("ok", { last: Date.now(), msg:"" });
+      return { got: e.got + w.got, sent: Object.keys(e.push).length + Object.keys(w.push).length };
+    } catch (err) {
+      const c = (err && err.code) || "UNKNOWN";
+      if (c === "SIGNED_OUT") return null;
+      if (SESSION_DEAD.has(c)) {
+        sess = null; await Store.del(AUTH_KEY);
+        setState("off", { msg:"" });
+        toast("Sua sessão expirou. Entre de novo para continuar sincronizando.");
+      } else if (c === "NETWORK") setState("offline");
+      else { if (c === "UNKNOWN") console.error(err); setState("err", { msg: syncMsg(c) }); }
+      return null;
+    } finally {
+      busy = false;
+      if (again) { again = false; queue(400); }
+    }
+  }
+
+  return {
+    enabled, state: st, busy: () => busy,
+    signedIn: () => !!sess, email: () => sess ? sess.email : "", session: () => sess,
+    async signUp(email, pw){ return adopt(await idCall("signUp", { email, password:pw, returnSecureToken:true }), email); },
+    async signIn(email, pw){ return adopt(await idCall("signInWithPassword", { email, password:pw, returnSecureToken:true }), email); },
+    reset: email => idCall("sendOobCode", { requestType:"PASSWORD_RESET", email }),
+    async signOut(){ clearTimeout(timer); sess = null; await Store.del(AUTH_KEY); setState("off", { last:0, msg:"" }); },
+    async restore(){
+      if (!enabled) return;
+      const s = await Store.get(AUTH_KEY);
+      if (s && s.uid && s.refresh) { sess = s; setState("ok", { last:0, msg:"" }); }
+    },
+    sync, queue
+  };
+})();
+
+/* ---------- interface da conta ---------- */
+function agoShort(ts){
+  const m = Math.floor((Date.now() - ts) / 60000);
+  if (m < 1) return "agora";
+  if (m < 60) return "há " + m + " min";
+  const h = Math.floor(m / 60);
+  if (h < 24) return "há " + h + (h === 1 ? " hora" : " horas");
+  return agoText(ts);
+}
+function cloudStatus(){
+  const s = Cloud.state;
+  if (s.s === "sync") return "Sincronizando…";
+  if (s.s === "offline") return "Sem conexão. Sincroniza quando voltar.";
+  if (s.s === "err") return "Não sincronizou: " + s.msg;
+  return s.last ? "Sincronizado " + agoShort(s.last) + "." : "Aguardando a primeira sincronização.";
+}
+function paintCloud(){
+  const b = document.getElementById("cloudBtn"); if (!b) return;
+  const s = Cloud.state.s;
+  b.hidden = !Cloud.enabled;
+  b.dataset.s = s;
+  const label = { off:"Conta e nuvem: entrar", ok:"Nuvem: sincronizado", sync:"Nuvem: sincronizando",
+                  err:"Nuvem: erro ao sincronizar", offline:"Nuvem: sem conexão" }[s] || "Nuvem";
+  b.setAttribute("aria-label", label); b.title = label;
+  if (view === "ajustes") renderAcct();
+}
+function renderAcct(){
+  const sec = document.getElementById("acctSection"), box = document.getElementById("acctCard");
+  if (!sec || !box) return;
+  sec.hidden = !Cloud.enabled;
+  if (!Cloud.enabled) return;
+  if (!Cloud.signedIn()) {
+    box.innerHTML =
+      '<div class="eyebrow" style="margin-bottom:9px">Só neste aparelho</div>' +
+      '<h3>Guarde na nuvem</h3>' +
+      '<p class="note" style="font-size:13px;margin:0 0 15px">Com uma conta, seus registros ficam salvos, aparecem em qualquer aparelho e sobrevivem a um celular perdido.</p>' +
+      '<button class="btn btn-primary" id="acctIn">Entrar ou criar conta</button>';
+  } else {
+    box.innerHTML =
+      '<div class="eyebrow" style="margin-bottom:8px">Conectado como</div>' +
+      '<div class="who">' + esc(Cloud.email()) + '</div>' +
+      '<div class="stat-line"><span class="sd" data-s="' + Cloud.state.s + '"></span><span>' + esc(cloudStatus()) + '</span></div>' +
+      '<div class="acts"><button class="btn btn-soft btn-sm" id="acctSync">Sincronizar agora</button>' +
+      '<button class="btn btn-ghost btn-sm" id="acctOut">Sair</button></div>';
+  }
+}
+function authMsgFor(code){
+  return ({
+    EMAIL_EXISTS: "Esse e-mail já tem conta. Use Entrar.",
+    INVALID_LOGIN_CREDENTIALS: "E-mail ou senha incorretos.",
+    INVALID_PASSWORD: "E-mail ou senha incorretos.",
+    EMAIL_NOT_FOUND: "E-mail ou senha incorretos.",
+    WEAK_PASSWORD: "A senha precisa ter pelo menos 6 caracteres.",
+    INVALID_EMAIL: "Confira o e-mail digitado.",
+    MISSING_EMAIL: "Digite o e-mail.",
+    MISSING_PASSWORD: "Digite a senha.",
+    TOO_MANY_ATTEMPTS_TRY_LATER: "Muitas tentativas seguidas. Espere alguns minutos.",
+    USER_DISABLED: "Essa conta foi desativada.",
+    OPERATION_NOT_ALLOWED: "O login por e-mail não está ativo neste projeto.",
+    NETWORK: "Sem conexão. Conecte-se e tente de novo."
+  })[code] || ("Não deu certo (" + code + "). Tente de novo.");
+}
+
+function openAuth(first){
+  let mode = first === "up" ? "up" : "in";
+  openSheet(
+    '<h2 id="sheetTitle">Conta na nuvem</h2>' +
+    '<p class="sub">Seus registros ficam numa área privada: só quem entra com este e-mail e senha consegue ler e gravar.</p>' +
+    '<div class="seg" role="tablist"><button type="button" role="tab" id="aIn">Entrar</button>' +
+    '<button type="button" role="tab" id="aUp">Criar conta</button></div>' +
+    '<form id="aForm" novalidate>' +
+      '<div class="field"><label class="eyebrow" for="aMail">E-mail</label>' +
+      '<input type="email" id="aMail" name="email" autocomplete="username" inputmode="email" autocapitalize="off" autocorrect="off" spellcheck="false" maxlength="120" placeholder="voce@email.com"></div>' +
+      '<div class="field"><label class="eyebrow" for="aPass">Senha</label>' +
+      '<div class="pw"><input type="password" id="aPass" name="password" maxlength="100" placeholder="mínimo 6 caracteres">' +
+      '<button type="button" id="aShow">mostrar</button></div></div>' +
+      '<div class="msg" id="aMsg" role="alert" aria-live="polite"></div>' +
+      '<div class="sheet-actions"><button type="button" class="btn btn-ghost" id="aCancel">Cancelar</button>' +
+      '<button type="submit" class="btn btn-primary" id="aGo">Entrar</button></div>' +
+    '</form>' +
+    '<div style="text-align:center;margin-top:12px"><button type="button" class="linkbtn" id="aForgot">Esqueci a senha</button></div>'
+  );
+  const $ = id => document.getElementById(id);
+  const mail = $("aMail"), pass = $("aPass"), go = $("aGo"), msg = $("aMsg");
+  const say = (t, k) => { msg.textContent = t; msg.className = "msg" + (k ? " " + k : ""); };
+  const paint = () => {
+    $("aIn").setAttribute("aria-selected", mode === "in");
+    $("aUp").setAttribute("aria-selected", mode === "up");
+    pass.autocomplete = mode === "up" ? "new-password" : "current-password";
+    go.textContent = mode === "up" ? "Criar conta" : "Entrar";
+    $("aForgot").hidden = mode === "up";
+  };
+  paint();
+  $("aIn").addEventListener("click", () => { mode = "in"; say("", ""); paint(); });
+  $("aUp").addEventListener("click", () => { mode = "up"; say("", ""); paint(); });
+  $("aCancel").addEventListener("click", closeSheet);
+  $("aShow").addEventListener("click", ev => {
+    const hide = pass.type === "password";
+    pass.type = hide ? "text" : "password";
+    ev.currentTarget.textContent = hide ? "ocultar" : "mostrar";
+  });
+  $("aForgot").addEventListener("click", async () => {
+    const email = mail.value.trim();
+    if (!/^\S+@\S+\.\S+$/.test(email)) { say("Digite seu e-mail acima e toque de novo.", "err"); mail.focus(); return; }
+    say("Enviando…", "");
+    try {
+      await Cloud.reset(email);
+      say("Se esse e-mail tiver conta, o link para criar uma nova senha chega em alguns minutos. Olhe também o spam.", "ok");
+    } catch(e){ say(authMsgFor(e.code), "err"); }
+  });
+  $("aForm").addEventListener("submit", async ev => {
+    ev.preventDefault();
+    const email = mail.value.trim(), pw = pass.value;
+    if (!/^\S+@\S+\.\S+$/.test(email)) { say("Confira o e-mail digitado.", "err"); return; }
+    if (!pw) { say("Digite a senha.", "err"); return; }
+    if (mode === "up" && pw.length < 6) { say("A senha precisa ter pelo menos 6 caracteres.", "err"); return; }
+    go.disabled = true; go.textContent = mode === "up" ? "Criando…" : "Entrando…"; say("", "");
+    try {
+      if (mode === "up") await Cloud.signUp(email, pw); else await Cloud.signIn(email, pw);
+    } catch(e){ go.disabled = false; paint(); say(authMsgFor(e.code), "err"); return; }
+    await afterAuth(mode);
+  });
+  setTimeout(() => mail.focus(), 320);
+}
+
+/* depois de entrar: se o aparelho guarda dados de OUTRA conta, não mistura */
+async function afterAuth(mode){
+  const s = Cloud.session();
+  const other = !!(db.cloud && db.cloud.uid && db.cloud.uid !== s.uid);
+  const proceed = async wipe => {
+    if (wipe) { db = freshDb(db.settings.theme); resetSig(); }
+    db.cloud = { uid: s.uid, email: s.email };
+    await Store.save(db);
+    closeSheet();
+    const res = await Cloud.sync("login");
+    render();
+    if (!res) { toast(Cloud.state.s === "offline" ? "Entrou. Sincroniza quando a conexão voltar." : "Entrou, mas não sincronizou. Toque em Sincronizar agora."); return; }
+    const parts = [];
+    if (res.got) parts.push(res.got + (res.got === 1 ? " registro trazido" : " registros trazidos") + " da nuvem");
+    if (res.sent) parts.push(res.sent + (res.sent === 1 ? " enviado" : " enviados"));
+    toast((mode === "up" ? "Conta criada" : "Entrou") + " · " + (parts.length ? parts.join(" · ") : "tudo em dia"));
+  };
+  if (!other) return proceed(false);
+  openSheet(
+    '<h2 id="sheetTitle">Dados de outra conta</h2>' +
+    '<p class="sub">Este aparelho ainda guarda registros de <b>' + esc(db.cloud.email || "outra conta") + '</b>. ' +
+    'Para entrar em <b>' + esc(s.email) + '</b>, eles saem daqui. Continuam salvos na conta de origem.</p>' +
+    '<div class="sheet-actions"><button class="btn btn-ghost" id="oNo">Cancelar</button>' +
+    '<button class="btn btn-danger" id="oGo">Entrar e limpar</button></div>'
+  );
+  document.getElementById("oGo").addEventListener("click", () => proceed(true));
+  document.getElementById("oNo").addEventListener("click", async () => { await Cloud.signOut(); closeSheet(); render(); });
+}
+
+function openSignOut(){
+  openSheet(
+    '<h2 id="sheetTitle">Sair da conta?</h2>' +
+    '<p class="sub">Seus registros ficam salvos na nuvem e voltam quando você entrar de novo. <b>Este aparelho será limpo.</b></p>' +
+    '<div class="msg" id="oMsg" role="alert" aria-live="polite"></div>' +
+    '<div class="sheet-actions"><button class="btn btn-ghost" id="oNo">Cancelar</button>' +
+    '<button class="btn btn-danger" id="oGo">Sair e limpar</button></div>'
+  );
+  const go = document.getElementById("oGo"), msg = document.getElementById("oMsg");
+  let force = false;
+  document.getElementById("oNo").addEventListener("click", closeSheet);
+  go.addEventListener("click", async () => {
+    if (!force) {
+      go.disabled = true; go.textContent = "Sincronizando…";
+      while (Cloud.busy()) await new Promise(r => setTimeout(r, 150));
+      const res = await Cloud.sync("saindo");
+      go.disabled = false;
+      if (!res) {
+        force = true; go.textContent = "Sair mesmo assim";
+        msg.className = "msg err";
+        msg.textContent = "Não consegui sincronizar agora. O que você registrou desde a última sincronização será perdido.";
+        return;
+      }
+    }
+    await Cloud.signOut();
+    db = freshDb(db.settings.theme); resetSig();
+    await Store.save(db);
+    closeSheet(); view = "hoje"; render();
+    toast("Você saiu. Este aparelho foi limpo.");
+  });
+}
+
+async function manualSync(){
+  const res = await Cloud.sync("manual");
+  if (res) {
+    const bits = [];
+    if (res.got) bits.push(res.got + " novos");
+    if (res.sent) bits.push(res.sent + " enviados");
+    toast(bits.length ? "Sincronizado · " + bits.join(" · ") : "Tudo em dia");
+  } else if (Cloud.state.s === "offline") toast("Sem conexão. Tente de novo quando voltar.");
+  else if (Cloud.state.s === "err") toast("Não sincronizou: " + Cloud.state.msg);
+}
+
+document.getElementById("cloudBtn").addEventListener("click", () => { if (Cloud.signedIn()) manualSync(); else openAuth("in"); });
+document.getElementById("acctCard").addEventListener("click", ev => {
+  const b = ev.target.closest("button"); if (!b) return;
+  if (b.id === "acctIn") openAuth("in");
+  else if (b.id === "acctSync") manualSync();
+  else if (b.id === "acctOut") openSignOut();
+});
+/* voltou para o app ou a internet voltou: confere a nuvem */
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden && Cloud.signedIn() && Date.now() - Cloud.state.last > 20000) Cloud.sync("foco");
+});
+window.addEventListener("online", () => { if (Cloud.signedIn()) Cloud.sync("online"); });
+
+/* ---------- ícone + manifest ---------- */
+(function icon(){
+  try {
+    const c = document.createElement("canvas"); c.width = c.height = 180;
+    const g = c.getContext("2d");
+    g.fillStyle = "#161A2B"; g.beginPath();
+    if (g.roundRect) g.roundRect(0,0,180,180,44); else g.rect(0,0,180,180);
+    g.fill();
+    const dots = [[62,62,14,.3],[118,62,14,.5],[62,118,14,.72]];
+    dots.forEach(d => { g.globalAlpha = d[3]; g.fillStyle = "#E9ECE4";
+      g.beginPath(); g.arc(d[0],d[1],d[2],0,7); g.fill(); });
+    g.globalAlpha = 1; g.fillStyle = "#CFE035";
+    g.beginPath(); g.arc(118,118,20,0,7); g.fill();
+    const url = c.toDataURL("image/png");
+    const l = document.createElement("link"); l.rel = "apple-touch-icon"; l.href = url;
+    document.head.appendChild(l);
+    const man = { name:"Pontual", short_name:"Pontual", start_url:".", display:"standalone",
+      background_color:"#E9ECE4", theme_color:"#E9ECE4",
+      icons:[{ src:url, sizes:"180x180", type:"image/png", purpose:"any" }] };
+    const ml = document.createElement("link"); ml.rel = "manifest";
+    ml.href = URL.createObjectURL(new Blob([JSON.stringify(man)], { type:"application/manifest+json" }));
+    document.head.appendChild(ml);
+  } catch(e){}
+})();
+
+/* ---------- início ---------- */
+(async function init(){
+  db = normalizeDb(await Store.load());
+  resetSig();
+  applyTheme();
+  await Cloud.restore();
+  render();
+  paintCloud();
+  document.addEventListener("keydown", e => { if (e.key === "Escape") closeSheet(); });
+  if (Cloud.signedIn()) Cloud.sync("abertura");
+})();
+</script>
+</body>
+</html>
