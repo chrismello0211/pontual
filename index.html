@@ -269,6 +269,8 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--violet);outline-
 .sheet .sub b{color:var(--ink)}
 .sheet-actions{display:flex;gap:9px;margin-top:8px}
 .sheet-actions .btn{flex:1}
+.sheet:has(.sheet-actions.sticky){padding-bottom:0}
+.sheet-actions.sticky{position:sticky;bottom:0;z-index:2;background:var(--paper);margin:10px -18px 0;padding:12px 18px calc(14px + env(safe-area-inset-bottom));border-top:1px solid var(--rule)}   /* folhas longas: Salvar sempre à vista */
 
 /* ---------- nuvem ---------- */
 .hact{margin-left:auto;display:flex;gap:8px;align-items:center}
@@ -423,6 +425,53 @@ input[type=text],input[type=email],input[type=password],input[type=number],selec
 html[data-locked="1"] .wrap,html[data-locked="1"] header,html[data-locked="1"] nav.tabs,html[data-locked="1"] #sheet,html[data-locked="1"] #scrim{visibility:hidden}
 body.curtain .wrap,body.curtain header,body.curtain nav.tabs,body.curtain #sheet,body.curtain #scrim{visibility:hidden}
 
+/* ---------- medições e fotos de progresso ---------- */
+.subhead{display:none;align-items:center;gap:12px;flex:1;min-width:0}
+.subhead h1{flex:1;margin:0;font-size:21px;letter-spacing:-.03em;font-family:'Bricolage Grotesque','Archivo',sans-serif;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.subhead .icon-btn{margin-left:0}
+body[data-sub="1"] .logo,body[data-sub="1"] .hact{display:none}
+body[data-sub="1"] .subhead{display:flex}
+.mcard,#medResumo{padding:15px}
+.mhead{display:flex;align-items:center;gap:10px;width:100%;background:none;border:0;padding:0;text-align:left;color:inherit;font-family:inherit;cursor:pointer}
+.mhead .mtxt{flex:1;display:flex;flex-direction:column;gap:3px;min-width:0}
+.msub{font-size:12.5px;color:var(--muted);line-height:1.35}
+.mval{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}
+.mval b{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:28px;letter-spacing:-.03em;line-height:1.1}
+.mdelta{font-family:'Martian Mono',monospace;font-size:11px;font-weight:600}
+.mdelta.dn{color:var(--green)}
+.mdelta.upv{color:var(--ink-2)}
+.mtop{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:6px}
+.mdate{font-size:12px;color:var(--muted);padding-top:4px}
+canvas.graf{width:100%;height:170px;display:block;touch-action:pan-y;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.mhist{display:flex;align-items:center;gap:6px;width:100%;margin-top:10px;padding:12px 0 0;border:0;border-top:1px solid var(--rule);background:none;color:var(--violet);font-family:inherit;font-weight:700;font-size:13.5px;cursor:pointer;text-align:left}
+.mhist .chev{margin-left:auto}
+.mrow{display:flex;align-items:center;gap:10px;width:100%;background:none;border:0;border-bottom:1px solid var(--rule);padding:13px 2px;color:inherit;font-family:inherit;text-align:left;cursor:pointer}
+.mrow:last-child{border-bottom:0}
+.mrow .mn{flex:1;font-weight:600;font-size:14.5px}
+.mrow .mn.dim{font-weight:500;color:var(--ink-2);font-size:13.5px}
+.mrow .mv{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:15px}
+.mrow .mv.none{color:var(--muted);font-weight:500}
+.chev{color:var(--muted);flex:0 0 auto}
+#mLista,#dList,#dGoal{padding:2px 15px}
+.thumbs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:12px}
+.pth{position:relative;width:100%;aspect-ratio:3/4;border-radius:10px;overflow:hidden;background:var(--paper-2);cursor:pointer}
+.pth img{width:100%;height:100%;object-fit:cover;display:block}
+.pth.sel{outline:3px solid var(--violet);outline-offset:-3px}
+.pth.none::after{content:'sem imagem';position:absolute;inset:0;display:grid;place-items:center;font-size:10px;color:var(--muted);font-family:'Martian Mono',monospace}
+.skel{background:linear-gradient(100deg,var(--paper-2) 30%,var(--rule) 50%,var(--paper-2) 70%);background-size:200% 100%;animation:shim 1.3s linear infinite}
+@keyframes shim{to{background-position:-200% 0}}
+.pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.plab{text-align:center;font-size:11px;color:var(--muted);margin-top:4px;font-family:'Martian Mono',monospace}
+.pprev{display:block;width:100%;max-height:46vh;object-fit:contain;border-radius:12px;background:#000}
+.pbox{width:100%;aspect-ratio:3/4;border-radius:14px;overflow:hidden;background:var(--paper-2);display:grid;place-items:center}
+.pbox img{width:100%;height:100%;object-fit:cover;display:block;cursor:zoom-in}
+.cmprow{display:flex;gap:10px}
+.cmp{flex:1;min-width:0}
+#fview{position:fixed;inset:0;z-index:96;background:rgba(0,0,0,.96);display:flex;align-items:center;justify-content:center;touch-action:none;overscroll-behavior:contain}
+#fview img{max-width:100%;max-height:100%;will-change:transform;user-select:none;-webkit-user-select:none;pointer-events:none}
+#fviewX{position:absolute;top:calc(env(safe-area-inset-top,0px) + 12px);right:14px;width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.16);color:#fff;border:0;font-size:18px;cursor:pointer}
+body.curtain #fview,html[data-locked="1"] #fview{visibility:hidden}
+
 /* ---------- tabs ---------- */
 nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:40;
   background:color-mix(in srgb,var(--paper) 90%,transparent);
@@ -466,6 +515,13 @@ hr.dash{border:0;border-top:1px dashed var(--rule-2);margin:16px 0}
         <b>Pontual</b><br>
         <span>mapa de aplicações</span>
       </div>
+    </div>
+    <div class="subhead">
+      <button class="icon-btn" id="subBack" type="button" aria-label="Voltar">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>
+      </button>
+      <h1 id="subTitle">Medições</h1>
+      <button class="btn btn-primary btn-sm" id="subAct" type="button" data-act="reg">Registrar</button>
     </div>
     <div class="hact">
       <button class="icon-btn" id="cloudBtn" data-s="off" aria-label="Conta e nuvem: entrar" title="Conta e nuvem: entrar" hidden>
@@ -632,11 +688,8 @@ hr.dash{border:0;border-top:1px dashed var(--rule-2);margin:16px 0}
     </div>
 
     <div class="section">
-      <div class="section-h">
-        <div class="eyebrow">Peso</div><div class="line"></div>
-        <button class="chip" id="addWeight">+ anotar</button>
-      </div>
-      <div class="card" style="padding:14px 15px" id="weightCard"></div>
+      <div class="section-h"><div class="eyebrow">Medições e fotos</div><div class="line"></div></div>
+      <div class="card" id="medResumo"></div>
     </div>
 
     <div class="section">
@@ -774,6 +827,33 @@ hr.dash{border:0;border-top:1px dashed var(--rule-2);margin:16px 0}
       <span class="mono" id="verNote" style="font-size:10px;letter-spacing:.08em"></span>
     </p>
   </section>
+
+  <section id="view-medidas" hidden>
+    <div class="section" style="margin-top:16px"><div class="card mcard" id="mFotos"></div></div>
+    <div class="section"><div class="card mcard" id="mPeso"></div></div>
+    <div class="section">
+      <div class="section-h"><div class="eyebrow">Medidas</div><div class="line"></div></div>
+      <div class="card" id="mLista"></div>
+    </div>
+  </section>
+
+  <section id="view-medida" hidden>
+    <div class="section" style="margin-top:16px"><div class="card mcard" id="dChart"></div></div>
+    <div class="section" id="dGoalSec" hidden><div class="card" id="dGoal"></div></div>
+    <div class="section">
+      <div class="section-h"><div class="eyebrow">Histórico</div><div class="line"></div></div>
+      <p class="note" id="dHint" style="margin:0 2px 8px"></p>
+      <div class="card" id="dList"></div>
+    </div>
+  </section>
+
+  <section id="view-fotos" hidden>
+    <div class="section" style="margin-top:16px">
+      <p class="note" id="fInfo" style="margin:0 2px 10px"></p>
+      <div id="fTools"></div>
+      <div id="fList"></div>
+    </div>
+  </section>
 </div>
 
 <!-- ======================= SHEET ======================= -->
@@ -901,8 +981,8 @@ const DEFAULTS = { dose:2.5, interval:7, pharmacy:"", lot:"", conc:"", val:"", w
 const LOCAL_KEYS = ["theme","remind","icsAt","tour","push"];
 const keepLocal = s => { const o = {}; if (s && typeof s === "object") LOCAL_KEYS.forEach(k => { if (k in s) o[k] = s[k]; }); return o; };
 const freshDb = prev => ({
-  entries: [], weights: [],
-  tomb: { entries:{}, weights:{} },   // ids apagados: é o que leva a exclusão para os outros aparelhos
+  entries: [], weights: [], meas: [], fotos: [],
+  tomb: { entries:{}, weights:{}, meas:{}, fotos:{} },   // ids apagados: é o que leva a exclusão para os outros aparelhos
   cloud: null,                        // conta a que este aparelho está ligado: { uid, email }
   settings: Object.assign({}, DEFAULTS, { theme:"auto", remind:false, icsAt:0, tour:0, push:false, u:0 }, typeof prev === "string" ? { theme: prev } : keepLocal(prev))
 });
@@ -914,8 +994,10 @@ function normalizeDb(saved){
   const fix = r => (r && typeof r === "object" && typeof r.id === "string") ? (r.u ? r : Object.assign({}, r, { u: r.ts || 0 })) : null;
   d.entries = (saved.entries || []).map(fix).filter(Boolean);
   d.weights = (saved.weights || []).map(fix).filter(Boolean);
+  d.meas = (saved.meas || []).map(fix).filter(Boolean);
+  d.fotos = (saved.fotos || []).map(fix).filter(Boolean);
   const t = saved.tomb || {};
-  d.tomb = { entries: Object.assign({}, t.entries), weights: Object.assign({}, t.weights) };
+  d.tomb = { entries: Object.assign({}, t.entries), weights: Object.assign({}, t.weights), meas: Object.assign({}, t.meas), fotos: Object.assign({}, t.fotos) };
   d.cloud = saved.cloud && saved.cloud.uid ? saved.cloud : null;
   d.settings = Object.assign(d.settings, saved.settings || {});
   return d;
@@ -1145,7 +1227,7 @@ function renderDiario(){
   renderPunct();
 
   // peso
-  document.getElementById("weightCard").innerHTML = weightCardHtml();
+  renderMedResumo();
 
   // histórico
   const hl = document.getElementById("historyList");
@@ -1189,15 +1271,20 @@ function renderAjustes(){
     : "Tudo fica guardado " + Store.mode() + ". Nada é enviado para servidor nenhum.";
 }
 
+const VIEWS = ["hoje","mapa","diario","ajustes","medidas","medida","fotos"];
 function render(){
-  ["hoje","mapa","diario","ajustes"].forEach(v =>
-    document.getElementById("view-" + v).hidden = (v !== view));
+  VIEWS.forEach(v => document.getElementById("view-" + v).hidden = (v !== view));
+  const tab = PARENT[view] ? "diario" : view;           // telas de dentro do Diário mantêm a aba Diário marcada
   document.querySelectorAll("nav.tabs button").forEach(b =>
-    b.setAttribute("aria-selected", b.dataset.tab === view));
+    b.setAttribute("aria-selected", b.dataset.tab === tab));
+  renderSub();
   if (view === "hoje") renderHoje();
   if (view === "mapa") renderMapa();
   if (view === "diario") renderDiario();
   if (view === "ajustes") renderAjustes();
+  if (view === "medidas") renderMedidas();
+  if (view === "medida") renderMedida();
+  if (view === "fotos") renderFotos();
 }
 async function persist(opts){
   const s = sigSettings();
@@ -1399,7 +1486,6 @@ document.body.addEventListener("click", ev => {
   }
 });
 
-document.getElementById("addWeight").addEventListener("click", openWeight);
 
 // ajustes
 document.getElementById("view-ajustes").addEventListener("click", async ev => {
@@ -1434,6 +1520,7 @@ function applyTheme(){
   const t = db.settings.theme || "auto";
   const eff = t === "auto" ? (darkMQ && darkMQ.matches ? "dark" : "light") : t;
   document.documentElement.setAttribute("data-theme", eff);
+  try { Chart.redraw(); } catch (e) {}                 // gráficos repintam com as cores do novo tema
   // a barra de status do celular acompanha o tema que está na tela (e não só o do sistema)
   document.querySelectorAll('meta[name="theme-color"]').forEach(m => { m.setAttribute("content", eff === "dark" ? "#0F1220" : "#E9ECE4"); m.removeAttribute("media"); });
 }
@@ -1454,7 +1541,7 @@ function download(blob, name){
 }
 
 document.getElementById("exportBtn").addEventListener("click", async () => {
-  const r = await deliver(new Blob([JSON.stringify({ app:"pontual", v:2, entries:db.entries, weights:db.weights, settings:db.settings }, null, 2)], { type:"application/json" }),
+  const r = await deliver(new Blob([JSON.stringify({ app:"pontual", v:3, entries:db.entries, weights:db.weights, meas:db.meas, settings:db.settings }, null, 2)], { type:"application/json" }),
     "pontual-" + new Date().toISOString().slice(0,10) + ".json");
   if (r !== "abort") toast("Backup pronto");
 });
@@ -1479,6 +1566,7 @@ document.getElementById("importFile").addEventListener("change", ev => {
       });
       take(d.entries, "entries", r => num(r.ts) && typeof r.zoneId === "string");
       take(d.weights, "weights", r => num(r.ts) && num(r.kg) > 10 && num(r.kg) < 500);
+      take(d.meas, "meas", r => num(r.ts) && typeof r.k === "string" && r.k.length <= 16 && num(r.v) > 0 && num(r.v) < 1000);
       if (d.settings && typeof d.settings === "object") SYNC_KEYS.forEach(k => { if (k in d.settings) db.settings[k] = d.settings[k]; });
       await persist(); applyTheme(); render();
       toast(added ? "Backup juntado · " + added + (added === 1 ? " registro novo" : " registros novos") : "Backup lido · nada novo para juntar");
@@ -1498,9 +1586,14 @@ document.getElementById("wipeBtn").addEventListener("click", () => {
   document.getElementById("noWipe").addEventListener("click", closeSheet);
   document.getElementById("yesWipe").addEventListener("click", async () => {
     const keepCloud = Cloud.signedIn(), now = Date.now();
-    if (keepCloud) { db.entries.forEach(e => { db.tomb.entries[e.id] = now; }); db.weights.forEach(w => { db.tomb.weights[w.id] = now; }); }
-    db.entries = []; db.weights = [];
-    if (!keepCloud) db.tomb = { entries:{}, weights:{} };
+    if (keepCloud) {
+      db.entries.forEach(e => { db.tomb.entries[e.id] = now; }); db.weights.forEach(w => { db.tomb.weights[w.id] = now; });
+      db.meas.forEach(m => { db.tomb.meas[m.id] = now; }); db.fotos.forEach(f => { db.tomb.fotos[f.id] = now; });
+      for (const f of db.fotos) { try { await Cloud.raw("DELETE", "imagens/{uid}/" + f.id); } catch (e) {} }
+    }
+    await Fotos.clearLocal();
+    db.entries = []; db.weights = []; db.meas = []; db.fotos = [];
+    if (!keepCloud) db.tomb = { entries:{}, weights:{}, meas:{}, fotos:{} };
     db.settings = Object.assign({}, DEFAULTS, keepLocal(db.settings), { u: keepCloud ? now : 0 });
     resetSig();
     await persist(); closeSheet(); view = "hoje"; render(); toast("Tudo apagado");
@@ -1704,17 +1797,25 @@ const Cloud = (() => {
       const R = (remote && typeof remote === "object") ? remote : {};
       const e = mergeSet(db.entries, db.tomb.entries, R.entries, entryIn, entryOut);
       const w = mergeSet(db.weights, db.tomb.weights, R.weights, weightIn, weightOut);
+      const m = mergeSet(db.meas, db.tomb.meas, R.meas, measIn, measOut);
+      const f = mergeSet(db.fotos, db.tomb.fotos, R.fotos, fotoIn, fotoOut);
       const s = mergeSettings(R.settings);
-      db.entries = e.list; db.weights = w.list;
+      db.entries = e.list; db.weights = w.list; db.meas = m.list; db.fotos = f.list;
+      const novo = e.got + e.removed + w.got + w.removed + m.got + m.removed + f.got + f.removed;
       db.cloud = { uid: sess.uid, email: sess.email };
       await Store.save(db);
-      if (e.got + e.removed + w.got + w.removed > 0 || s.pulled) render();
+      if (novo > 0 || s.pulled) render();
       if (Object.keys(e.push).length) await call("PATCH", "entries", e.push);
       if (Object.keys(w.push).length) await call("PATCH", "weights", w.push);
+      // nós novos: se as regras do banco ainda não os conhecem, não derrubam o resto da sincronização
+      const soft = async (met, sub, body) => { try { await call(met, sub, body); } catch (er) { if (er && er.code === "DENIED") console.warn("sync: nó recusado pelas regras:", sub); else throw er; } };
+      if (Object.keys(m.push).length) await soft("PATCH", "meas", m.push);
+      if (Object.keys(f.push).length) await soft("PATCH", "fotos", f.push);
       if (s.push) await call("PUT", "settings", s.push);
+      await Fotos.syncBlobs();                         // imagens: envia o que falta, apaga o que foi excluído
       setState("ok", { last: Date.now(), msg:"" });
-      if (e.got + e.removed + w.got + w.removed > 0 || s.pulled) Push.queue(1500);     // veio coisa nova: atualiza a fila de avisos
-      return { got: e.got + w.got, sent: Object.keys(e.push).length + Object.keys(w.push).length };
+      if (novo > 0 || s.pulled) Push.queue(1500);     // veio coisa nova: atualiza a fila de avisos
+      return { got: e.got + w.got + m.got + f.got, sent: Object.keys(e.push).length + Object.keys(w.push).length + Object.keys(m.push).length + Object.keys(f.push).length };
     } catch (err) {
       const c = (err && err.code) || "UNKNOWN";
       if (c === "SIGNED_OUT") return null;
@@ -1877,7 +1978,7 @@ async function afterAuth(mode){
   const s = Cloud.session();
   const other = !!(db.cloud && db.cloud.uid && db.cloud.uid !== s.uid);
   const proceed = async wipe => {
-    if (wipe) { db = freshDb(db.settings); resetSig(); }
+    if (wipe) { await Fotos.clearLocal(); db = freshDb(db.settings); resetSig(); }
     db.cloud = { uid: s.uid, email: s.email };
     await Store.save(db);
     closeSheet();
@@ -1925,9 +2026,17 @@ function openSignOut(){
         msg.textContent = "Não consegui sincronizar agora. O que você registrou desde a última sincronização será perdido.";
         return;
       }
+      const pf = await Fotos.pending();
+      if (pf > 0) {
+        force = true; go.textContent = "Sair mesmo assim";
+        msg.className = "msg err";
+        msg.textContent = pf + (pf === 1 ? " foto ainda não foi enviada para a nuvem e será perdida." : " fotos ainda não foram enviadas para a nuvem e serão perdidas.");
+        return;
+      }
     }
     await Push.disable();                    // este aparelho deixa de receber os avisos da conta
     await Cloud.signOut();
+    await Fotos.clearLocal();                // as fotos saem do aparelho (continuam na conta)
     db = freshDb(db.settings); resetSig();
     await Store.save(db);
     closeSheet(); view = "hoje"; render();
@@ -1962,7 +2071,7 @@ window.addEventListener("online", () => { if (Cloud.signedIn()) Cloud.sync("onli
 /* =====================================================
    12. DATA PREVISTA, LEMBRETES, VOLUME DA DOSE, PONTUALIDADE
    ===================================================== */
-const APP_VERSION = '2026.10.13.3'; /*v*/
+const APP_VERSION = '2026.10.14.1'; /*v*/
 const dayStart = ts => { const d = new Date(ts); d.setHours(0, 0, 0, 0); return d.getTime(); };
 const calDays = ts => Math.round((dayStart(ts) - dayStart(Date.now())) / DAY);     // 0 = hoje, 1 = amanhã, -1 = ontem
 const pad2 = n => String(n).padStart(2, "0");
@@ -2123,14 +2232,18 @@ async function deliver(blob, name){
 function buildCsv(){
   const q = v => { let s = String(v == null ? "" : v); if (/^[=+\-@\t\r]/.test(s)) s = "'" + s; return '"' + s.replace(/"/g, '""') + '"'; };
   const fd = new Intl.DateTimeFormat("pt-BR"), ft = new Intl.DateTimeFormat("pt-BR", { hour: "2-digit", minute: "2-digit" });
-  const rows = [["tipo", "data", "hora", "local", "dose_mg", "lote", "concentracao", "sensacoes", "observacoes", "peso_kg"]];
+  const rows = [["tipo", "data", "hora", "local", "dose_mg", "lote", "concentracao", "sensacoes", "observacoes", "peso_kg", "medida", "valor"]];
   db.entries.slice().sort((a, b) => a.ts - b.ts).forEach(e => {
     const z = zoneById(e.zoneId), d = new Date(e.ts);
-    rows.push(["aplicacao", fd.format(d), ft.format(d), z ? z.n : e.zoneId, String(e.dose).replace(".", ","), e.lot || "", e.conc || "", arr(e.feelings).join(" | "), e.note || "", ""]);
+    rows.push(["aplicacao", fd.format(d), ft.format(d), z ? z.n : e.zoneId, String(e.dose).replace(".", ","), e.lot || "", e.conc || "", arr(e.feelings).join(" | "), e.note || "", "", "", ""]);
   });
   db.weights.slice().sort((a, b) => a.ts - b.ts).forEach(w => {
     const d = new Date(w.ts);
-    rows.push(["peso", fd.format(d), ft.format(d), "", "", "", "", "", "", String(w.kg).replace(".", ",")]);
+    rows.push(["peso", fd.format(d), ft.format(d), "", "", "", "", "", "", String(w.kg).replace(".", ","), "", ""]);
+  });
+  db.meas.slice().sort((a, b) => a.ts - b.ts).forEach(x => {
+    const d = new Date(x.ts), def = medDef(x.k);
+    rows.push(["medida", fd.format(d), ft.format(d), "", "", "", "", "", "", "", def ? def.n : x.k, String(x.v).replace(".", ",") + (def ? " " + def.u : "")]);
   });
   return "\uFEFF" + rows.map(r => r.map(q).join(";")).join("\r\n") + "\r\n";
 }
@@ -2437,87 +2550,6 @@ function weightStats(){
   if (win.length >= 2) { const span = (win[win.length - 1].ts - win[0].ts) / DAY; if (span >= 7) rate = (win[win.length - 1].kg - win[0].kg) / (span / 7); }
   return { w, first, last, goal, delta: last.kg - first.kg, toGoal: goal ? last.kg - goal : null, rate };
 }
-function weightChart(st){
-  const W = 300, H = 118, L = 30, R = 8, T = 10, B = 20, pts = st.w, t0 = pts[0].ts, t1 = pts[pts.length - 1].ts;
-  const vals = pts.map(p => p.kg).concat(st.goal ? [st.goal] : []);
-  let mn = Math.min.apply(null, vals), mx = Math.max.apply(null, vals);
-  if (mx - mn < 2) { mn -= 1; mx += 1; }
-  const pad = (mx - mn) * .12; mn -= pad; mx += pad;
-  const X = ts => L + (t1 === t0 ? (W - L - R) / 2 : (ts - t0) / (t1 - t0) * (W - L - R));
-  const Y = kg => T + (mx - kg) / (mx - mn) * (H - T - B);
-  const short = ts => clean(new Intl.DateTimeFormat("pt-BR", { day: "2-digit", month: "short" }).format(ts));
-  const line = pts.map(p => X(p.ts).toFixed(1) + "," + Y(p.kg).toFixed(1)).join(" ");
-  const lastP = pts[pts.length - 1];
-  return '<svg class="wchart" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Gráfico do peso ao longo do tempo">' +
-    '<line x1="' + L + '" y1="' + Y(mx - pad).toFixed(1) + '" x2="' + (W - R) + '" y2="' + Y(mx - pad).toFixed(1) + '" stroke="var(--rule)"/>' +
-    '<line x1="' + L + '" y1="' + Y(mn + pad).toFixed(1) + '" x2="' + (W - R) + '" y2="' + Y(mn + pad).toFixed(1) + '" stroke="var(--rule)"/>' +
-    '<text x="' + (L - 4) + '" y="' + (Y(mx - pad) + 3).toFixed(1) + '" text-anchor="end" class="wt">' + Math.round(mx - pad) + '</text>' +
-    '<text x="' + (L - 4) + '" y="' + (Y(mn + pad) + 3).toFixed(1) + '" text-anchor="end" class="wt">' + Math.round(mn + pad) + '</text>' +
-    (st.goal ? '<line x1="' + L + '" y1="' + Y(st.goal).toFixed(1) + '" x2="' + (W - R) + '" y2="' + Y(st.goal).toFixed(1) + '" stroke="var(--green)" stroke-dasharray="4 3" stroke-width="1.4"/>' +
-      '<text x="' + (W - R) + '" y="' + (Y(st.goal) - 4).toFixed(1) + '" text-anchor="end" class="wt" fill="var(--green)">meta ' + fmtKg(st.goal) + '</text>' : '') +
-    (pts.length > 1 ? '<polyline points="' + line + '" fill="none" stroke="var(--violet)" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"/>' : '') +
-    pts.map(p => '<circle cx="' + X(p.ts).toFixed(1) + '" cy="' + Y(p.kg).toFixed(1) + '" r="2.8" fill="var(--violet)"/>').join("") +
-    '<circle cx="' + X(lastP.ts).toFixed(1) + '" cy="' + Y(lastP.kg).toFixed(1) + '" r="5.2" fill="var(--mark)" stroke="var(--violet)" stroke-width="1.6"/>' +
-    '<text x="' + L + '" y="' + (H - 4) + '" class="wt">' + short(t0) + '</text>' +
-    (t1 !== t0 ? '<text x="' + (W - R) + '" y="' + (H - 4) + '" text-anchor="end" class="wt">' + short(t1) + '</text>' : '') + '</svg>';
-}
-function weightCardHtml(){
-  const st = weightStats();
-  if (!st) return '<p class="note" style="margin:0">Nenhuma anotação ainda. Opcional: serve para acompanhar a tendência e a meta. Toque para anotar.</p>';
-  let goalTxt = "";
-  if (st.goal) goalTxt = Math.abs(st.toGoal) < 0.05 ? "Meta atingida" : "Faltam " + fmtKg(Math.abs(st.toGoal)) + " kg para a meta de " + fmtKg(st.goal) + " kg";
-  const rate = st.rate === null ? "" : (st.rate > 0 ? "+" : (st.rate < 0 ? "−" : "")) + fmtKg(Math.abs(st.rate)) + " kg por semana (últimas 4 semanas)";
-  return '<div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:6px">' +
-    '<div class="display" style="font-size:29px">' + fmtKg(st.last.kg) + '<span style="font-size:14px;color:var(--muted)"> kg</span></div>' +
-    '<div class="mono" style="font-size:11px;color:' + (st.delta <= 0 ? "var(--green)" : "var(--ink-2)") + '">' +
-    (st.delta > 0 ? "+" : (st.delta < 0 ? "−" : "")) + fmtKg(Math.abs(st.delta)) + ' kg desde o início</div></div>' +
-    weightChart(st) +
-    (goalTxt ? '<div class="wline"><span class="sd" data-s="ok"></span>' + goalTxt + '</div>' : '') +
-    (rate ? '<div class="wline">' + rate + '</div>' : '') +
-    '<div class="eyebrow" style="margin-top:8px">' + st.w.length + (st.w.length === 1 ? " anotação" : " anotações") + ' · toque para editar</div>';
-}
-function openWeight(){
-  const last = db.weights.slice().sort((a, b) => b.ts - a.ts)[0], goal = num(db.settings.goalKg);
-  const list = db.weights.slice().sort((a, b) => b.ts - a.ts).slice(0, 12);
-  openSheet(
-    '<h2 id="sheetTitle">Peso</h2><p class="sub">Opcional, e só pra você acompanhar.</p>' +
-    '<div class="two"><div class="field"><label class="eyebrow">Peso (kg)</label>' +
-    '<input type="number" step="0.1" inputmode="decimal" id="wKg" placeholder="' + (last ? last.kg : "00,0") + '"></div>' +
-    '<div class="field"><label class="eyebrow">Data</label>' +
-    '<input type="datetime-local" id="wWhen" value="' + localISO(new Date()) + '"></div></div>' +
-    '<div class="field"><label class="eyebrow" for="wGoal">Meta de peso (kg)</label>' +
-    '<input type="number" step="0.1" inputmode="decimal" id="wGoal" placeholder="opcional" value="' + (goal || "") + '"></div>' +
-    '<div class="sheet-actions"><button class="btn btn-ghost" id="wCancel" type="button">Cancelar</button>' +
-    '<button class="btn btn-primary" id="wSave" type="button">Salvar</button></div>' +
-    (list.length ? '<div class="eyebrow" style="margin:20px 0 6px">Anotações recentes</div><div id="wList">' +
-      list.map(p => '<div class="wrow"><span><b>' + fmtKg(p.kg) + ' kg</b><small>' + clean(fFull.format(p.ts)) + ', ' + fTime.format(p.ts) + '</small></span>' +
-        '<button class="wdel" type="button" data-wdel="' + p.id + '" aria-label="Apagar anotação de ' + fmtKg(p.kg) + ' kg">Apagar</button></div>').join("") + '</div>' +
-      '<button class="btn btn-danger btn-sm" id="wClear" type="button" style="width:100%;margin-top:12px">Apagar todas as anotações de peso</button>' : '')
-  );
-  const b = document.getElementById("sheetBody");
-  b.querySelector("#wCancel").addEventListener("click", closeSheet);
-  b.querySelectorAll("[data-wdel]").forEach(x => x.addEventListener("click", async () => {
-    const id = x.dataset.wdel;
-    db.weights = db.weights.filter(p => p.id !== id); markDeleted("weights", id);
-    await persist(); render(); openWeight(); toast("Anotação apagada");
-  }));
-  const cl = b.querySelector("#wClear");
-  if (cl) cl.addEventListener("click", async () => {
-    db.weights.forEach(w => markDeleted("weights", w.id));
-    db.weights = []; await persist(); closeSheet(); render(); toast("Anotações de peso apagadas");
-  });
-  b.querySelector("#wSave").addEventListener("click", async () => {
-    const kgTxt = String(b.querySelector("#wKg").value).replace(",", "."), gTxt = String(b.querySelector("#wGoal").value).replace(",", ".");
-    const kg = parseFloat(kgTxt), g = gTxt === "" ? 0 : parseFloat(gTxt), wantsKg = kgTxt !== "";
-    if (wantsKg && !(kg >= 20 && kg <= 400)) { toast("Informe um peso entre 20 e 400 kg"); return; }
-    if (gTxt !== "" && !(g >= 20 && g <= 400)) { toast("A meta precisa ficar entre 20 e 400 kg"); return; }
-    if (!wantsKg && g === goal) { toast("Informe o peso ou a meta"); return; }
-    if (wantsKg) { const w = b.querySelector("#wWhen").value; db.weights.push({ id: uid(), ts: w ? new Date(w).getTime() : Date.now(), kg: +kg.toFixed(1), u: Date.now() }); }
-    db.settings.goalKg = g ? +g.toFixed(1) : 0;
-    await persist(); closeSheet(); render();
-    toast(wantsKg ? "Peso anotado" : (g ? "Meta salva" : "Meta removida"));
-  });
-}
 
 /* ---------- relatório para levar à consulta ---------- */
 function reportModel(days){
@@ -2550,6 +2582,8 @@ function reportText(m){
   m.E.forEach(e => { const z = zoneById(e.zoneId), d = new Date(e.ts);
     L.push(dd(d) + " " + fTime.format(d) + " · " + (z ? z.n : e.zoneId) + " · " + String(e.dose).replace(".", ",") + " mg" + (e.lot ? " · lote " + e.lot : "") + (arr(e.feelings).length ? " · " + arr(e.feelings).join(", ") : "") + (e.note ? " · obs: " + e.note : "")); });
   if (m.W.length) { L.push("", "PESOS"); m.W.forEach(w => L.push(dd(w.ts) + " · " + fmtKg(w.kg) + " kg")); }
+  const ms = medSummary();
+  if (ms.length) { L.push("", "MEDIDAS"); ms.forEach(x => L.push(x.def.n + ": " + fmtV(x.last.v, x.def.u) + " em " + dd(x.last.ts) + (x.delta !== null ? " (" + (x.delta > 0 ? "+" : (x.delta < 0 ? "−" : "")) + fmtV(Math.abs(x.delta), x.def.u) + " desde " + dd(x.first.ts) + ")" : ""))); }
   L.push("", "Registro pessoal feito no app Pontual com o que a pessoa anotou. Não substitui prontuário nem a orientação de quem prescreve.");
   return L.join("\n");
 }
@@ -2573,6 +2607,7 @@ function reportHtml(m){
         return '<tr><td>' + dd(d) + '<br>' + fTime.format(d) + '</td><td>' + esc(z ? z.n : e.zoneId) + '</td><td>' + esc(String(e.dose).replace(".", ",")) + ' mg</td><td>' + esc(e.lot || "—") + '</td><td>' +
           esc(arr(e.feelings).join(", ")) + (e.note ? (arr(e.feelings).length ? "<br>" : "") + 'obs: ' + esc(e.note) : "") + '</td></tr>'; }).join("") + '</tbody></table>' : '<p>Nenhuma aplicação no período.</p>') +
     (m.W.length ? '<h2>Pesos</h2><table class="rlist"><thead><tr><th>Data</th><th>Peso</th></tr></thead><tbody>' + m.W.map(w => '<tr><td>' + dd(w.ts) + '</td><td>' + fmtKg(w.kg) + ' kg</td></tr>').join("") + '</tbody></table>' : '') +
+    (medSummary().length ? '<h2>Medidas</h2><table class="rlist"><thead><tr><th>Medida</th><th>Último valor</th><th>Data</th><th>Variação</th></tr></thead><tbody>' + medSummary().map(x => '<tr><td>' + esc(x.def.n) + '</td><td>' + fmtV(x.last.v, x.def.u) + '</td><td>' + dd(x.last.ts) + '</td><td>' + (x.delta !== null ? (x.delta > 0 ? '+' : (x.delta < 0 ? '−' : '')) + fmtV(Math.abs(x.delta), x.def.u) : '—') + '</td></tr>').join('') + '</tbody></table>' : '') +
     '<p class="rfoot">Registro pessoal feito no app Pontual com o que a pessoa anotou. Não substitui prontuário nem a orientação de quem prescreve.</p></article>';
 }
 function openReport(){
@@ -2640,6 +2675,7 @@ const Lock = (() => {
   function hide(){ $("lockScr").hidden = true; buf = ""; mode = null; }
   function lockNow(){
     locked = true; mode = "unlock";
+    try { Viewer.close(); } catch (e) {}
     document.documentElement.setAttribute("data-locked", "1");
     show("Digite o PIN", "O Pontual está bloqueado.", { forgot: true });
   }
@@ -2692,6 +2728,7 @@ const Lock = (() => {
   async function wipe(){
     try { await Push.disable(); } catch (e) {}
     try { await Cloud.signOut(); } catch (e) {}
+    await Fotos.clearLocal();
     db = freshDb(db.settings.theme); resetSig(); await Store.save(db);
     cfg = null; await Store.del(LK); unlocked();
     view = "hoje"; render(); toast("Aparelho limpo. Entre na conta para recuperar os registros.");
@@ -2791,7 +2828,698 @@ document.getElementById("view-ajustes").addEventListener("click", async ev => {
   }
 });
 document.getElementById("repBtn").addEventListener("click", openReport);
-document.getElementById("weightCard").addEventListener("click", openWeight);
+
+/* =====================================================
+   16. MEDIÇÕES E FOTOS DE PROGRESSO: dados, imagens e sincronização
+   (desenho e telas: bloco 17)
+   ===================================================== */
+const MEDS = [
+  { k: "peso",       n: "Peso corporal",        u: "kg", min: 20, max: 400 },
+  { k: "gordura",    n: "Gordura corporal",     u: "%",  min: 2,  max: 70 },
+  { k: "cintura",    n: "Cintura",              u: "cm", min: 40, max: 250 },
+  { k: "abdomen",    n: "Abdômen",              u: "cm", min: 40, max: 250 },
+  { k: "quadril",    n: "Quadril",              u: "cm", min: 50, max: 250 },
+  { k: "peito",      n: "Peito",                u: "cm", min: 50, max: 250 },
+  { k: "pescoco",    n: "Pescoço",              u: "cm", min: 20, max: 80 },
+  { k: "ombros",     n: "Ombros",               u: "cm", min: 60, max: 250 },
+  { k: "bracoE",     n: "Bíceps esquerdo",      u: "cm", min: 15, max: 80 },
+  { k: "bracoD",     n: "Bíceps direito",       u: "cm", min: 15, max: 80 },
+  { k: "antebracoE", n: "Antebraço esquerdo",   u: "cm", min: 12, max: 60 },
+  { k: "antebracoD", n: "Antebraço direito",    u: "cm", min: 12, max: 60 },
+  { k: "coxaE",      n: "Coxa esquerda",        u: "cm", min: 25, max: 120 },
+  { k: "coxaD",      n: "Coxa direita",         u: "cm", min: 25, max: 120 },
+  { k: "pantE",      n: "Panturrilha esquerda", u: "cm", min: 20, max: 80 },
+  { k: "pantD",      n: "Panturrilha direita",  u: "cm", min: 20, max: 80 }
+];
+const medDef = k => MEDS.find(m => m.k === k) || null;
+const fmtV = (v, u) => (Math.round(v * 10) / 10).toLocaleString("pt-BR") + (u === "%" ? "%" : " " + u);
+/* série de uma medida: o peso vem de db.weights (já existia); as demais, de db.meas */
+function medSeries(k){
+  const rows = k === "peso"
+    ? db.weights.map(w => ({ id: w.id, ts: w.ts, v: w.kg, src: "w" }))
+    : db.meas.filter(m => m.k === k).map(m => ({ id: m.id, ts: m.ts, v: m.v, src: "m" }));
+  return rows.sort((a, b) => a.ts - b.ts);
+}
+/* resumo para o relatório: último valor de cada medida e a variação desde a primeira (o peso já tem seção própria) */
+function medSummary(){
+  return MEDS.filter(m => m.k !== "peso").map(m => {
+    const s = medSeries(m.k); if (!s.length) return null;
+    const first = s[0], last = s[s.length - 1];
+    return { def: m, first, last, delta: s.length > 1 ? last.v - first.v : null };
+  }).filter(Boolean);
+}
+/* ---------- registro <-> nuvem ---------- */
+const measOut = m => ({ u: up(m), ts: m.ts, k: cut(m.k, 16), v: m.v });
+function measIn(id, r){
+  if (!r || typeof r !== "object" || r.del === true) return null;
+  const ts = num(r.ts), v = num(r.v);
+  if (!ts || !(v > 0 && v < 1000) || typeof r.k !== "string" || !r.k || r.k.length > 16) return null;
+  return { id, ts, k: r.k, v, u: up(r) };
+}
+const fotoOut = f => ({ u: up(f), ts: f.ts });
+function fotoIn(id, r){
+  if (!r || typeof r !== "object" || r.del === true) return null;
+  const ts = num(r.ts);
+  return ts ? { id, ts, u: up(r) } : null;
+}
+
+/* ---------- imagens no aparelho (IndexedDB; cai para a memória se o navegador não deixar) ---------- */
+const ImgDB = (() => {
+  let p = null; const mem = new Map();
+  const open = () => p || (p = new Promise(res => {
+    try {
+      const r = indexedDB.open("pontual-img", 1);
+      r.onupgradeneeded = () => r.result.createObjectStore("fotos", { keyPath: "id" });
+      r.onsuccess = () => res(r.result); r.onerror = () => res(null); r.onblocked = () => res(null);
+    } catch (e) { res(null); }
+  }));
+  const rq = r => new Promise((res, rej) => { r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); });
+  const st = async mode => { const d = await open(); return d ? d.transaction("fotos", mode).objectStore("fotos") : null; };
+  return {
+    persistent: async () => !!(await open()),
+    async get(id){ const s = await st("readonly"); return s ? ((await rq(s.get(id))) || null) : (mem.get(id) || null); },
+    async put(rec){ const s = await st("readwrite"); if (s) await rq(s.put(rec)); else mem.set(rec.id, rec); },
+    async del(id){ const s = await st("readwrite"); if (s) await rq(s.delete(id)); else mem.delete(id); },
+    async all(){ const s = await st("readonly"); return s ? await rq(s.getAll()) : Array.from(mem.values()); },
+    async clear(){ const s = await st("readwrite"); if (s) await rq(s.clear()); mem.clear(); }
+  };
+})();
+
+/* ---------- compressão (a mesma do ForgeX: 1200 px, qualidade 0,8; se passar de ~230 KB, 1000 px a 0,72) ---------- */
+function comprimeImagem(file, maxLado, q){
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onerror = () => rej(new Error("leitura"));
+    r.onload = () => {
+      const img = new Image();
+      img.onerror = () => rej(new Error("imagem"));
+      img.onload = () => {
+        let sw = img.width, sh = img.height, src = img;
+        const esc = Math.min(1, maxLado / Math.max(sw, sh));
+        const alvoW = Math.max(1, Math.round(sw * esc)), alvoH = Math.max(1, Math.round(sh * esc));
+        // reduz por metades até perto do alvo: nitidez muito melhor que reduzir num passo só
+        while (sw * 0.5 > alvoW && sh * 0.5 > alvoH) {
+          const c2 = document.createElement("canvas");
+          c2.width = Math.round(sw * 0.5); c2.height = Math.round(sh * 0.5);
+          const g2 = c2.getContext("2d"); g2.imageSmoothingEnabled = true; g2.imageSmoothingQuality = "high";
+          g2.drawImage(src, 0, 0, c2.width, c2.height);
+          src = c2; sw = c2.width; sh = c2.height;
+        }
+        const c = document.createElement("canvas"); c.width = alvoW; c.height = alvoH;
+        const g = c.getContext("2d"); g.imageSmoothingEnabled = true; g.imageSmoothingQuality = "high";
+        g.fillStyle = "#fff"; g.fillRect(0, 0, alvoW, alvoH);          // JPEG não tem transparência
+        g.drawImage(src, 0, 0, alvoW, alvoH);
+        let out = c.toDataURL("image/jpeg", q);
+        if (out.length > 280000) out = c.toDataURL("image/jpeg", Math.max(0.5, (q || 0.72) - 0.16));
+        res(out);
+      };
+      img.src = r.result;
+    };
+    r.readAsDataURL(file);
+  });
+}
+async function prepararFoto(file){
+  let b64 = await comprimeImagem(file, 1200, 0.8);
+  if (b64.length > 230000) b64 = await comprimeImagem(file, 1000, 0.72);
+  // imagem com muito detalhe ou ruído pode passar do limite que o banco aceita (340 KB): reduz mais, só se precisar
+  for (const t of [[860, 0.66], [720, 0.6], [560, 0.55], [420, 0.5]]) { if (b64.length <= 320000) break; b64 = await comprimeImagem(file, t[0], t[1]); }
+  return b64;
+}
+
+/* A ficha da foto (data) viaja com os outros registros; a IMAGEM fica separada em /imagens/<uid>/<id> e só é
+   baixada quando alguém abre a foto. Assim a sincronização nunca arrasta megabytes de imagens. */
+const Fotos = (() => {
+  const cache = new Map();
+  const list = () => db.fotos.slice().sort((a, b) => b.ts - a.ts);
+  async function image(id){
+    if (cache.has(id)) return cache.get(id);
+    const rec = await ImgDB.get(id);
+    if (rec && rec.b64) { cache.set(id, rec.b64); return rec.b64; }
+    if (Cloud.signedIn()) {
+      try {
+        const s = await Cloud.raw("GET", "imagens/{uid}/" + id);
+        if (typeof s === "string" && s.indexOf("data:image/") === 0) { await ImgDB.put({ id, b64: s, up: true }); cache.set(id, s); return s; }
+      } catch (e) {}
+    }
+    return null;
+  }
+  async function upload(id){
+    if (!Cloud.signedIn()) return false;
+    const rec = await ImgDB.get(id); if (!rec) return false;
+    if (rec.up) return true;
+    try { await Cloud.raw("PUT", "imagens/{uid}/" + id, rec.b64); rec.up = true; await ImgDB.put(rec); return true; } catch (e) { return false; }
+  }
+  async function save(b64, ts){
+    const id = uid();
+    await ImgDB.put({ id, b64, up: false }); cache.set(id, b64);
+    db.fotos.push({ id, ts, u: Date.now() }); await persist();
+    upload(id).catch(() => {});
+    return id;
+  }
+  async function setDate(id, ts){ const f = db.fotos.find(x => x.id === id); if (!f) return; f.ts = ts; f.u = Date.now(); await persist(); }
+  async function remove(id){
+    db.fotos = db.fotos.filter(x => x.id !== id); markDeleted("fotos", id); await persist();
+    cache.delete(id); await ImgDB.del(id);
+    if (Cloud.signedIn()) {
+      try { await Cloud.raw("DELETE", "imagens/{uid}/" + id); }
+      catch (e) { db.settings.imgDel = (Array.isArray(db.settings.imgDel) ? db.settings.imgDel : []).concat(id); await persist({ local: true }); }   // tenta de novo no próximo sync
+    }
+  }
+  const pending = async () => (await ImgDB.all()).filter(r => !r.up && db.fotos.some(f => f.id === r.id)).length;
+  /* depois de cada sync: apaga na nuvem o que foi excluído, tira daqui o que outro aparelho excluiu e envia o que falta */
+  async function syncBlobs(){
+    if (!Cloud.signedIn()) return;
+    try {
+      const pend = Array.isArray(db.settings.imgDel) ? db.settings.imgDel.slice() : [];
+      for (const id of pend) {
+        try { await Cloud.raw("DELETE", "imagens/{uid}/" + id); db.settings.imgDel = db.settings.imgDel.filter(x => x !== id); } catch (e) { break; }
+      }
+      for (const rec of await ImgDB.all()) {
+        if (!db.fotos.some(f => f.id === rec.id)) { if (db.tomb.fotos[rec.id]) { await ImgDB.del(rec.id); cache.delete(rec.id); } continue; }
+        if (!rec.up) await upload(rec.id);
+      }
+      await persist({ local: true });
+    } catch (e) {}
+  }
+  async function clearLocal(){ cache.clear(); await ImgDB.clear(); }
+  return { list, image, save, setDate, remove, pending, syncBlobs, clearLocal };
+})();
+
+/* ---------- visualizador de foto em tela cheia (pinça, toque duplo, arrastar para baixo fecha) ---------- */
+const Viewer = {
+  el: null, img: null, sc: 1, tx: 0, ty: 0, baseW: 0, baseH: 0, pts: new Map(), g0: null, lastTap: 0, swipe: null,
+  open(src){
+    if (Viewer.el) Viewer.close();
+    const ov = document.createElement("div"); ov.id = "fview"; ov.setAttribute("role", "dialog"); ov.setAttribute("aria-label", "Foto ampliada");
+    const img = document.createElement("img"); img.src = src; img.alt = "";
+    const x = document.createElement("button"); x.type = "button"; x.id = "fviewX"; x.setAttribute("aria-label", "Fechar foto"); x.textContent = "✕";
+    x.addEventListener("click", () => Viewer.close());
+    ov.append(img, x); document.body.appendChild(ov); document.body.style.overflow = "hidden";
+    Viewer.el = ov; Viewer.img = img; Viewer.sc = 1; Viewer.tx = 0; Viewer.ty = 0; Viewer.pts.clear(); Viewer.g0 = null;
+    const mede = () => { const r = img.getBoundingClientRect(); Viewer.baseW = r.width / Viewer.sc; Viewer.baseH = r.height / Viewer.sc; };
+    if (img.complete) mede(); else img.onload = mede;
+    ov.addEventListener("pointerdown", Viewer._pd); ov.addEventListener("pointermove", Viewer._pm);
+    ov.addEventListener("pointerup", Viewer._pu); ov.addEventListener("pointercancel", Viewer._pu);
+    ov.addEventListener("wheel", Viewer._wh, { passive: false });
+    ov.addEventListener("touchmove", ev => ev.preventDefault(), { passive: false });
+  },
+  close(){ if (!Viewer.el) return; Viewer.el.remove(); Viewer.el = null; Viewer.img = null; document.body.style.overflow = ""; },
+  _clamp(){
+    const vw = window.innerWidth, vh = window.innerHeight;
+    const mw = Math.max(0, (Viewer.baseW * Viewer.sc - vw) / 2) + (Viewer.sc > 1 ? 40 : 0);
+    const mh = Math.max(0, (Viewer.baseH * Viewer.sc - vh) / 2) + (Viewer.sc > 1 ? 40 : 0);
+    Viewer.tx = Math.max(-mw, Math.min(mw, Viewer.tx)); Viewer.ty = Math.max(-mh, Math.min(mh, Viewer.ty));
+  },
+  _aplica(anim){ const i = Viewer.img; if (!i) return; i.style.transition = anim ? "transform .18s ease" : ""; i.style.transform = "translate3d(" + Viewer.tx + "px," + Viewer.ty + "px,0) scale(" + Viewer.sc + ")"; },
+  _zoomEm(mx, my, novoSc, anim){
+    const C = { x: window.innerWidth / 2, y: window.innerHeight / 2 }, s0 = Viewer.sc, t0 = { x: Viewer.tx, y: Viewer.ty };
+    novoSc = Math.max(1, Math.min(4, novoSc));
+    Viewer.tx = mx - C.x - (novoSc / s0) * (mx - C.x - t0.x); Viewer.ty = my - C.y - (novoSc / s0) * (my - C.y - t0.y);
+    Viewer.sc = novoSc;
+    if (Viewer.sc === 1) { Viewer.tx = 0; Viewer.ty = 0; }
+    Viewer._clamp(); Viewer._aplica(anim);
+  },
+  _pd(ev){
+    if (ev.target && ev.target.closest && ev.target.closest("button")) return;
+    ev.preventDefault();
+    Viewer.pts.set(ev.pointerId, { x: ev.clientX, y: ev.clientY });
+    if (Viewer.pts.size === 2) {
+      const [a, b] = Array.from(Viewer.pts.values());
+      Viewer.g0 = { d: Math.hypot(a.x - b.x, a.y - b.y), m: { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 }, sc: Viewer.sc, t: { x: Viewer.tx, y: Viewer.ty } };
+      Viewer.swipe = null;
+    } else if (Viewer.pts.size === 1) {
+      Viewer.g0 = { m: { x: ev.clientX, y: ev.clientY }, sc: Viewer.sc, t: { x: Viewer.tx, y: Viewer.ty } };
+      Viewer.swipe = (Viewer.sc === 1) ? { y0: ev.clientY, dy: 0 } : null;
+    }
+  },
+  _pm(ev){
+    if (!Viewer.pts.has(ev.pointerId)) return;
+    ev.preventDefault();
+    Viewer.pts.set(ev.pointerId, { x: ev.clientX, y: ev.clientY });
+    const g = Viewer.g0; if (!g) return;
+    if (Viewer.pts.size >= 2 && g.d) {
+      const [a, b] = Array.from(Viewer.pts.values());
+      const d = Math.hypot(a.x - b.x, a.y - b.y), m = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+      const novo = Math.max(1, Math.min(4, g.sc * (d / g.d))), C = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+      Viewer.tx = m.x - C.x - (novo / g.sc) * (g.m.x - C.x - g.t.x); Viewer.ty = m.y - C.y - (novo / g.sc) * (g.m.y - C.y - g.t.y);
+      Viewer.sc = novo; Viewer._clamp(); Viewer._aplica(false);
+    } else if (Viewer.pts.size === 1) {
+      const dx = ev.clientX - g.m.x, dy = ev.clientY - g.m.y;
+      if (Viewer.swipe) {
+        Viewer.swipe.dy = Math.max(0, dy); Viewer.ty = Viewer.swipe.dy; Viewer.tx = 0;
+        Viewer.el.style.background = "rgba(0,0,0," + Math.max(0.4, 0.96 - Viewer.swipe.dy / 300) + ")";
+        Viewer._aplica(false);
+      } else { Viewer.tx = g.t.x + dx; Viewer.ty = g.t.y + dy; Viewer._clamp(); Viewer._aplica(false); }
+    }
+  },
+  _pu(ev){
+    Viewer.pts.delete(ev.pointerId);
+    const g = Viewer.g0;
+    if (Viewer.swipe) {
+      if (Viewer.swipe.dy > 90) { Viewer.close(); return; }
+      Viewer.tx = 0; Viewer.ty = 0; Viewer.el.style.background = "rgba(0,0,0,.96)"; Viewer._aplica(true);
+      if (Viewer.swipe.dy < 8) {                                 // toque duplo: dá zoom
+        const agr = Date.now();
+        if (agr - Viewer.lastTap < 300) { Viewer._zoomEm(ev.clientX, ev.clientY, Viewer.sc > 1 ? 1 : 2.3, true); Viewer.lastTap = 0; } else Viewer.lastTap = agr;
+      }
+      Viewer.swipe = null;
+    } else if (g && Viewer.pts.size === 0 && Viewer.sc > 1) {
+      const agr = Date.now(), dx = Math.abs(ev.clientX - g.m.x), dy = Math.abs(ev.clientY - g.m.y);
+      if (dx < 8 && dy < 8) { if (agr - Viewer.lastTap < 300) { Viewer._zoomEm(ev.clientX, ev.clientY, 1, true); Viewer.lastTap = 0; } else Viewer.lastTap = agr; }
+    }
+    if (Viewer.pts.size < 2) Viewer.g0 = Viewer.pts.size === 1 ? (function(){ const p = Array.from(Viewer.pts.values())[0]; return { m: { x: p.x, y: p.y }, sc: Viewer.sc, t: { x: Viewer.tx, y: Viewer.ty } }; })() : null;
+  },
+  _wh(ev){ ev.preventDefault(); Viewer._zoomEm(ev.clientX, ev.clientY, Viewer.sc * (ev.deltaY < 0 ? 1.15 : 0.87), false); }
+};
+/* =====================================================
+   17. GRÁFICO, TELAS DE MEDIÇÕES E DE FOTOS
+   ===================================================== */
+const Chart = (() => {
+  const cssv = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  const theme = () => ({ rgb: cssv("--violet-rgb") || "59,44,196", violet: cssv("--violet") || "#3B2CC4", ink: cssv("--ink") || "#161A2B",
+    muted: cssv("--muted") || "#787F8E", card: cssv("--card") || "#F8F9F5", rule: cssv("--rule-2") || "rgba(22,26,43,.3)",
+    paper: cssv("--paper") || "#E9ECE4", mark: cssv("--mark") || "#CFE035", green: cssv("--green") || "#0F6E5C" });
+  function layout(cv){
+    const W = cv.clientWidth || 320, H = cv.clientHeight || 170, g = cv._g;
+    const vs = g.pontos.map(p => p.v), dmax = Math.max.apply(null, vs), dmin = Math.min.apply(null, vs);
+    const goal = g.opts.goal > 0 ? g.opts.goal : null;
+    const max = goal ? Math.max(dmax, goal) : dmax, min = goal ? Math.min(dmin, goal) : dmin;
+    const padL = 14, padR = 14, topo = 24, base = H - 30, span = (max - min) || 1, n = g.pontos.length, plano = (max === min);
+    const X = i => padL + (W - padL - padR) * (n === 1 ? 0.5 : i / (n - 1));
+    const Y = v => plano ? (topo + base) / 2 : base - (base - topo) * (v - min) / span;     // sem variação: a linha fica no meio
+    return { W, H, max, min, dmax, dmin, goal, padL, padR, topo, base, X, Y, n, plano, iMax: vs.indexOf(dmax), iMin: vs.lastIndexOf(dmin) };
+  }
+  /* curva monótona (Fritsch-Carlson): suave e sem inventar picos entre os pontos */
+  function curve(c, P){
+    const n = P.length; c.moveTo(P[0].x, P[0].y); if (n < 2) return;
+    const dx = [], m = [];
+    for (let i = 0; i < n - 1; i++) { dx[i] = P[i + 1].x - P[i].x; m[i] = dx[i] ? (P[i + 1].y - P[i].y) / dx[i] : 0; }
+    const tg = [m[0]];
+    for (let i = 1; i < n - 1; i++) tg[i] = (m[i - 1] * m[i] <= 0) ? 0 : (m[i - 1] + m[i]) / 2;
+    tg[n - 1] = m[n - 2];
+    for (let i = 0; i < n - 1; i++) {
+      if (m[i] === 0) { tg[i] = 0; tg[i + 1] = 0; continue; }
+      const a = tg[i] / m[i], b = tg[i + 1] / m[i], s = a * a + b * b;
+      if (s > 9) { const k = 3 / Math.sqrt(s); tg[i] = k * a * m[i]; tg[i + 1] = k * b * m[i]; }
+    }
+    for (let i = 0; i < n - 1; i++) { const q = dx[i] / 3; c.bezierCurveTo(P[i].x + q, P[i].y + q * tg[i], P[i + 1].x - q, P[i + 1].y - q * tg[i + 1], P[i + 1].x, P[i + 1].y); }
+  }
+  function bubble(c, x, y, w, h, r){
+    c.beginPath(); c.moveTo(x + r, y); c.lineTo(x + w - r, y); c.arcTo(x + w, y, x + w, y + r, r); c.lineTo(x + w, y + h - r);
+    c.arcTo(x + w, y + h, x + w - r, y + h, r); c.lineTo(x + r, y + h); c.arcTo(x, y + h, x, y + h - r, r); c.lineTo(x, y + r); c.arcTo(x, y, x + r, y, r); c.closePath();
+  }
+  function draw(cv, prog){
+    const g = cv._g; if (!g) return;
+    const dpr = window.devicePixelRatio || 1, L = layout(cv), T = theme(), fmt = v => g.fmt ? g.fmt(v) : String(v);
+    cv.width = L.W * dpr; cv.height = L.H * dpr;
+    const c = cv.getContext("2d"); c.setTransform(dpr, 0, 0, dpr, 0, 0); c.clearRect(0, 0, L.W, L.H);
+    const FONT = "Archivo, system-ui, -apple-system, sans-serif";
+    // grade
+    c.strokeStyle = T.rule; c.lineWidth = 1; c.setLineDash([3, 4]);
+    [0, .5, 1].forEach(f => { const y = L.topo + (L.base - L.topo) * f; c.beginPath(); c.moveTo(L.padL, y); c.lineTo(L.W - L.padR, y); c.stroke(); });
+    c.setLineDash([]);
+    // meta (só no peso)
+    if (L.goal) {
+      const y = L.Y(L.goal);
+      c.strokeStyle = T.green; c.lineWidth = 1.4; c.setLineDash([5, 4]); c.beginPath(); c.moveTo(L.padL, y); c.lineTo(L.W - L.padR, y); c.stroke(); c.setLineDash([]);
+      c.font = "600 10px " + FONT; c.textAlign = "right"; c.fillStyle = T.green; c.fillText("meta " + fmt(L.goal), L.W - L.padR, y - 5);
+    }
+    // rótulos de máximo e mínimo: cada um vai para o lado OPOSTO de onde o extremo acontece (nunca em cima da linha)
+    c.font = "700 11px " + FONT; c.lineJoin = "round";
+    const label = (txt, y, iExt) => {
+      const left = L.X(iExt) > L.W / 2; c.textAlign = left ? "left" : "right";
+      const x = left ? L.padL : L.W - L.padR;
+      c.lineWidth = 4; c.strokeStyle = T.card; c.strokeText(txt, x, y); c.fillStyle = T.ink; c.fillText(txt, x, y);
+    };
+    if (L.plano) label(fmt(L.dmax), L.Y(L.dmax) - 10, L.n - 1);
+    else if (L.goal) { label(fmt(L.dmax), L.Y(L.dmax) - 8, L.iMax); label(fmt(L.dmin), L.Y(L.dmin) + 16, L.iMin); }
+    else { label(fmt(L.dmax), L.topo - 7, L.iMax); label(fmt(L.dmin), L.base - 6, L.iMin); }
+    // datas
+    c.fillStyle = T.muted; c.font = "10.5px " + FONT;
+    const p0 = g.pontos[0], pu = g.pontos[L.n - 1];
+    c.textAlign = "left"; if (p0.rot) c.fillText(p0.rot, L.padL, L.H - 9);
+    c.textAlign = "right"; if (L.n > 1 && pu.rot) c.fillText(pu.rot, L.W - L.padR, L.H - 9);
+    const P = g.pontos.map((p, i) => ({ x: L.X(i), y: L.Y(p.v) }));
+    // a linha é revelada da esquerda para a direita
+    const xCut = L.padL + (L.W - L.padL - L.padR + 4) * prog;
+    c.save(); c.beginPath(); c.rect(0, 0, xCut, L.H); c.clip();
+    const gr = c.createLinearGradient(0, L.topo, 0, L.base); gr.addColorStop(0, "rgba(" + T.rgb + ",.30)"); gr.addColorStop(1, "rgba(" + T.rgb + ",0)");
+    c.beginPath(); curve(c, P); c.lineTo(P[P.length - 1].x, L.base); c.lineTo(P[0].x, L.base); c.closePath(); c.fillStyle = gr; c.fill();
+    c.strokeStyle = T.violet; c.lineWidth = 2.6; c.lineJoin = "round"; c.lineCap = "round"; c.shadowColor = "rgba(" + T.rgb + ",.40)"; c.shadowBlur = 8;
+    c.beginPath(); curve(c, P); c.stroke(); c.shadowBlur = 0;
+    if (L.n <= 24) { c.fillStyle = T.violet; P.forEach((q, i) => { if (i === L.n - 1) return; c.beginPath(); c.arc(q.x, q.y, 2.6, 0, 7); c.fill(); }); }
+    c.restore();
+    if (prog >= 1) {                                                     // ponto final: o "marca-texto" do Pontual com halo
+      const q = P[L.n - 1];
+      c.fillStyle = "rgba(" + T.rgb + ",.20)"; c.beginPath(); c.arc(q.x, q.y, 9, 0, 7); c.fill();
+      c.fillStyle = T.mark; c.beginPath(); c.arc(q.x, q.y, 4.8, 0, 7); c.fill();
+      c.strokeStyle = T.violet; c.lineWidth = 1.8; c.stroke();
+    }
+    const s = g.sel;                                                      // seleção: guia vertical + balão com valor e data
+    if (prog >= 1 && s >= 0 && s < L.n) {
+      const q = P[s], p = g.pontos[s];
+      c.strokeStyle = T.rule; c.lineWidth = 1; c.beginPath(); c.moveTo(q.x, L.topo - 4); c.lineTo(q.x, L.base); c.stroke();
+      c.fillStyle = T.violet; c.beginPath(); c.arc(q.x, q.y, 6, 0, 7); c.fill(); c.strokeStyle = T.card; c.lineWidth = 2.2; c.stroke();
+      const l1 = fmt(p.v), l2 = p.dica || p.rot || "", l3 = (g.opts.onPonto && s === g.selFixa) ? "toque de novo para editar" : "";
+      c.font = "800 13px " + FONT; const w1 = c.measureText(l1).width;
+      c.font = "600 11px " + FONT; const w2 = c.measureText(l2).width, w3 = l3 ? c.measureText(l3).width : 0;
+      const bw = Math.max(w1, w2, w3) + 20, bh = l3 ? 56 : 42;
+      let bx = q.x - bw / 2; bx = Math.max(2, Math.min(L.W - bw - 2, bx));
+      let by = q.y - bh - 12; if (by < 2) by = q.y + 12;
+      c.fillStyle = T.ink; bubble(c, bx, by, bw, bh, 10); c.fill();
+      c.textAlign = "left"; c.fillStyle = T.paper; c.font = "800 13px " + FONT; c.fillText(l1, bx + 10, by + 18);
+      c.globalAlpha = .75; c.font = "600 11px " + FONT; c.fillText(l2, bx + 10, by + 33); c.globalAlpha = 1;
+      if (l3) { c.fillStyle = T.mark; c.fillText(l3, bx + 10, by + 48); }
+    }
+  }
+  function animate(cv){
+    const t0 = performance.now(), dur = 750, id = (cv._gAnim = (cv._gAnim || 0) + 1);
+    const step = t => {
+      if (cv._gAnim !== id || !cv.isConnected) return;
+      const k = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - k, 3);
+      draw(cv, e); if (k < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }
+  function wire(cv){
+    let touch = null, moved = false, t0 = 0, before = -1;
+    const index = ev => {
+      const g = cv._g; if (!g || !g.pontos.length) return -1;
+      const r = cv.getBoundingClientRect(), x = ev.clientX - r.left, L = layout(cv);
+      let bi = 0, bd = 1e9; g.pontos.forEach((p, i) => { const d = Math.abs(L.X(i) - x); if (d < bd) { bd = d; bi = i; } });
+      return bi;
+    };
+    const show = i => { const g = cv._g; if (!g || i < 0) return; if (i !== g.sel) { g.sel = i; draw(cv, 1); } };
+    const fade = () => { clearTimeout(cv._gT); cv._gT = setTimeout(() => { const g = cv._g; if (g) { g.sel = -1; g.selFixa = -1; draw(cv, 1); } }, 3200); };
+    cv.addEventListener("pointerdown", ev => { const g = cv._g; if (!g) return; clearTimeout(cv._gT); touch = { x: ev.clientX }; moved = false; t0 = Date.now(); before = g.selFixa; show(index(ev)); });
+    cv.addEventListener("pointermove", ev => { if (!touch) { if (ev.pointerType === "mouse") show(index(ev)); return; } if (Math.abs(ev.clientX - touch.x) > 6) moved = true; show(index(ev)); });
+    cv.addEventListener("pointerup", ev => {
+      const g = cv._g; if (!touch || !g) return;
+      const i = g.sel, tap = !moved && (Date.now() - t0) < 450; touch = null;
+      // 1º toque mostra o valor; tocar de novo no MESMO ponto abre a edição
+      if (tap && g.opts.onPonto && i >= 0 && i === before) { g.selFixa = -1; g.sel = -1; draw(cv, 1); g.opts.onPonto(i); return; }
+      g.selFixa = i; draw(cv, 1); fade();
+    });
+    cv.addEventListener("pointercancel", () => { touch = null; fade(); });
+    cv.addEventListener("pointerleave", ev => { if (ev.pointerType === "mouse") { const g = cv._g; if (g) { g.sel = -1; draw(cv, 1); } } });
+  }
+  function plot(cv, pontos, fmt, opts){
+    if (!cv || !pontos || !pontos.length) return;
+    cv._g = { pontos, fmt, opts: opts || {}, sel: -1, selFixa: -1 };
+    if (!cv._gOn) { cv._gOn = true; wire(cv); }
+    const calm = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (calm) draw(cv, 1); else animate(cv);
+  }
+  const redraw = () => document.querySelectorAll("canvas.graf").forEach(cv => { if (cv._g) draw(cv, 1); });
+  return { plot, redraw, draw };
+})();
+window.addEventListener("resize", () => Chart.redraw());
+
+/* ---------- navegação entre as telas de dentro do Diário ---------- */
+const PARENT = { medidas: "diario", medida: "medidas", fotos: "medidas" };
+let medCampo = "peso", fotoSel = false, fotoPick = [];
+function go(v, campo){ if (campo) medCampo = campo; view = v; selectedZone = null; fotoSel = false; fotoPick = []; render(); window.scrollTo(0, 0); }
+const goBack = () => go(PARENT[view] || "diario");
+function renderSub(){
+  const sub = !!PARENT[view];
+  document.body.dataset.sub = sub ? "1" : "";
+  if (!sub) return;
+  const t = document.getElementById("subTitle"), a = document.getElementById("subAct");
+  if (view === "medidas") { t.textContent = "Medições"; a.textContent = "Registrar"; a.dataset.act = "reg"; }
+  if (view === "medida") { t.textContent = (medDef(medCampo) || { n: "Medida" }).n; a.textContent = "Registrar"; a.dataset.act = "reg"; }
+  if (view === "fotos") { t.textContent = "Fotos de progresso"; a.textContent = "Adicionar"; a.dataset.act = "foto"; }
+}
+
+const CHEV = '<svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>';
+const shortDate = ts => new Intl.DateTimeFormat("pt-BR", { day: "2-digit", month: "2-digit" }).format(ts);
+const longDate = ts => new Intl.DateTimeFormat("pt-BR", { day: "2-digit", month: "short", year: "numeric" }).format(ts);
+const longDateFull = ts => new Intl.DateTimeFormat("pt-BR", { day: "2-digit", month: "long", year: "numeric" }).format(ts);
+const isoDay = ts => localISO(new Date(ts)).slice(0, 10);
+const tsOfDay = iso => iso === isoDay(Date.now()) ? Date.now() : new Date(iso + "T12:00:00").getTime();
+const deltaTxt = d => (d > 0 ? "+" : (d < 0 ? "−" : "")) + fmtV(Math.abs(d), "kg");
+
+function thumbEl(id){
+  const box = document.createElement("div"); box.className = "pth skel"; box.dataset.foto = id;
+  Fotos.image(id).then(src => {
+    box.classList.remove("skel");
+    if (src) { const im = document.createElement("img"); im.src = src; im.alt = ""; im.decoding = "async"; box.appendChild(im); } else box.classList.add("none");
+  }).catch(() => box.classList.remove("skel"));
+  return box;
+}
+function plotSerie(cv, s, k){
+  const def = medDef(k), goal = k === "peso" ? num(db.settings.goalKg) : 0;
+  Chart.plot(cv, s.map(p => ({ v: p.v, rot: shortDate(p.ts), dica: longDate(p.ts) })), v => fmtV(v, def.u), { goal, onPonto: i => openMedEdit(s[i], k) });
+}
+const histBtn = k => '<button class="mhist" type="button" data-nav="medida" data-campo="' + k + '">Histórico e edição' + CHEV + '</button>';
+
+/* resumo no Diário */
+function renderMedResumo(){
+  const box = document.getElementById("medResumo"); if (!box) return;
+  const ws = medSeries("peso"), u = ws[ws.length - 1], pr = ws[ws.length - 2];
+  const parts = []; if (db.meas.length) parts.push(db.meas.length + (db.meas.length === 1 ? " medida" : " medidas")); if (db.fotos.length) parts.push(db.fotos.length + (db.fotos.length === 1 ? " foto" : " fotos"));
+  box.innerHTML = '<button class="mhead" type="button" data-nav="medidas"><span class="mtxt">' +
+    (u ? '<span class="msub">Peso corporal · ' + dd(u.ts) + '</span><span class="mval"><b>' + fmtV(u.v, "kg") + '</b>' +
+         (pr ? '<span class="mdelta ' + (u.v - pr.v <= 0 ? "dn" : "upv") + '">' + deltaTxt(u.v - pr.v) + '</span>' : '') + '</span>'
+       : '<span class="msub">Peso, medidas e fotos</span><span class="mval"><b style="font-size:17px">Comece a acompanhar</b></span>') +
+    (parts.length ? '<span class="msub">' + parts.join(" · ") + '</span>' : '') + '</span>' + CHEV + '</button>';
+}
+
+/* tela Medições */
+function renderMedidas(){
+  const fotos = Fotos.list(), nf = fotos.length, fBox = document.getElementById("mFotos");
+  fBox.innerHTML = '<button class="mhead" type="button" data-nav="fotos"><span class="mtxt"><span class="eyebrow">Fotos de progresso</span><span class="msub">' +
+    (nf ? nf + (nf === 1 ? " foto" : " fotos") + " · só você vê" : "Uma foto por mês, com a mesma luz e o mesmo ângulo, mostra o que a balança não mostra.") + '</span></span>' + CHEV + '</button>';
+  if (nf) { const row = document.createElement("div"); row.className = "thumbs"; fotos.slice(0, 4).forEach(f => row.appendChild(thumbEl(f.id))); fBox.appendChild(row); }
+  // peso
+  const wBox = document.getElementById("mPeso"), ws = medSeries("peso");
+  if (ws.length) {
+    const u = ws[ws.length - 1], pr = ws[ws.length - 2], goal = num(db.settings.goalKg);
+    wBox.innerHTML = '<div class="mtop"><div><div class="msub">Peso corporal</div><div class="mval"><b>' + fmtV(u.v, "kg") + '</b>' +
+      (pr ? '<span class="mdelta ' + (u.v - pr.v <= 0 ? "dn" : "upv") + '">' + deltaTxt(u.v - pr.v) + '</span>' : '') + '</div></div><div class="mdate">' + dd(u.ts) + '</div></div>';
+    if (ws.length >= 2) { const cv = document.createElement("canvas"); cv.className = "graf"; wBox.appendChild(cv); requestAnimationFrame(() => plotSerie(cv, ws, "peso")); }
+    if (goal) wBox.insertAdjacentHTML("beforeend", '<div class="wline"><span class="sd" data-s="ok"></span>' + (Math.abs(u.v - goal) < 0.05 ? "Meta atingida" : "Faltam " + fmtV(Math.abs(u.v - goal), "kg") + " para a meta de " + fmtV(goal, "kg")) + '</div>');
+    wBox.insertAdjacentHTML("beforeend", histBtn("peso"));
+  } else wBox.innerHTML = '<p class="note" style="margin:0">Registre peso, gordura e medidas para acompanhar a evolução do corpo junto com o tratamento. Toque em Registrar.</p>';
+  // lista
+  document.getElementById("mLista").innerHTML = MEDS.map(m => {
+    const s = medSeries(m.k), u = s[s.length - 1];
+    return '<button class="mrow" type="button" data-nav="medida" data-campo="' + m.k + '"><span class="mn">' + m.n + '</span><span class="mv' + (u ? "" : " none") + '">' + (u ? fmtV(u.v, m.u) : "—") + '</span>' + CHEV + '</button>';
+  }).join("");
+}
+
+/* detalhe de uma medida */
+function renderMedida(){
+  const def = medDef(medCampo); if (!def) return;
+  const s = medSeries(def.k), cb = document.getElementById("dChart"), gs = document.getElementById("dGoalSec");
+  cb.innerHTML = "";
+  if (s.length >= 2) { const cv = document.createElement("canvas"); cv.className = "graf"; cb.appendChild(cv); requestAnimationFrame(() => plotSerie(cv, s, def.k)); }
+  else cb.innerHTML = '<p class="note" style="margin:0">' + (s.length ? "Com mais um registro o gráfico aparece." : "Nenhum registro de " + def.n.toLowerCase() + " ainda. Toque em Registrar.") + '</p>';
+  gs.hidden = def.k !== "peso";
+  if (def.k === "peso") {
+    const goal = num(db.settings.goalKg);
+    document.getElementById("dGoal").innerHTML = '<button class="mrow" type="button" id="goalBtn"><span class="mn">Meta de peso</span><span class="mv' + (goal ? "" : " none") + '">' + (goal ? fmtV(goal, "kg") : "definir") + '</span>' + CHEV + '</button>';
+  }
+  document.getElementById("dHint").textContent = s.length ? "Toque num registro para corrigir o valor, a data ou apagar." : "";
+  document.getElementById("dList").innerHTML = s.length
+    ? s.slice().reverse().map(p => '<button class="mrow" type="button" data-mrec="' + p.id + '"><span class="mn dim">' + longDate(p.ts) + '</span><span class="mv">' + fmtV(p.v, def.u) + '</span>' + CHEV + '</button>').join("")
+    : '<div class="empty" style="padding:22px 12px"><p>Sem registros.</p></div>';
+}
+
+/* tela de fotos */
+function renderFotos(){
+  const box = document.getElementById("fList"), tools = document.getElementById("fTools"), info = document.getElementById("fInfo"), ls = Fotos.list();
+  box.innerHTML = ""; tools.innerHTML = "";
+  if (!ls.length) {
+    info.textContent = "";
+    box.innerHTML = '<div class="empty"><b>Nenhuma foto ainda</b><p>Uma foto por mês, de frente para o espelho, com a mesma luz e o mesmo ângulo. Em três meses você vê a diferença que a balança não mostra.</p></div>' +
+      '<button class="btn btn-primary" type="button" data-act="foto">Adicionar a primeira foto</button>';
+    return;
+  }
+  info.textContent = ls.length + (ls.length === 1 ? " foto" : " fotos") + " · toque para abrir" + (Cloud.signedIn() ? "" : " · guardadas só neste aparelho");
+  if (ls.length >= 2) tools.innerHTML = '<button class="btn btn-soft" type="button" id="fCmp" style="margin-bottom:12px">' + (fotoSel ? "Toque em 2 fotos… (cancelar)" : "Comparar duas fotos") + '</button>';
+  const grid = document.createElement("div"); grid.className = "pgrid";
+  ls.forEach(f => {
+    const cel = document.createElement("div"); cel.className = "pcel";
+    const th = thumbEl(f.id); if (fotoPick.includes(f.id)) th.classList.add("sel");
+    const lb = document.createElement("div"); lb.className = "plab"; lb.textContent = new Intl.DateTimeFormat("pt-BR", { day: "2-digit", month: "2-digit", year: "2-digit" }).format(f.ts);
+    cel.append(th, lb); grid.appendChild(cel);
+  });
+  box.appendChild(grid);
+}
+
+/* ---------- registrar, corrigir e apagar medidas ---------- */
+function openMedReg(focusK){
+  const today = isoDay(Date.now());
+  openSheet(
+    '<h2 id="sheetTitle">Registrar medidas</h2><p class="sub">Preencha só o que você mediu. Cada medida vira um ponto no gráfico.</p>' +
+    '<div class="field"><label class="eyebrow" for="mrDate">Data</label><input type="date" id="mrDate" value="' + today + '" max="' + today + '"></div>' +
+    '<div class="two" id="mrGrid">' + MEDS.map(m => '<div class="field"><label class="eyebrow" for="mf-' + m.k + '">' + m.n + '</label>' +
+      '<input type="text" inputmode="decimal" id="mf-' + m.k + '" data-mf="' + m.k + '" placeholder="' + m.u + '" maxlength="6" autocomplete="off"></div>').join("") + '</div>' +
+    '<div class="sheet-actions sticky"><button class="btn btn-ghost" id="mrNo" type="button">Cancelar</button><button class="btn btn-primary" id="mrSave" type="button">Salvar</button></div>'
+  );
+  const b = document.getElementById("sheetBody");
+  b.querySelector("#mrNo").addEventListener("click", closeSheet);
+  if (focusK && b.querySelector("#mf-" + focusK)) setTimeout(() => b.querySelector("#mf-" + focusK).focus(), 350);
+  b.querySelector("#mrSave").addEventListener("click", async () => {
+    const iso = b.querySelector("#mrDate").value;
+    if (!iso || isNaN(new Date(iso + "T12:00:00").getTime())) { toast("Escolha a data das medidas"); return; }
+    const vals = {};
+    for (const m of MEDS) {
+      const inp = b.querySelector("#mf-" + m.k), raw = inp.value.trim().replace(",", ".");
+      if (raw === "") continue;
+      const v = Number(raw);
+      if (!isFinite(v) || v < m.min || v > m.max) { toast(m.n + ": informe um valor entre " + m.min + " e " + m.max + " " + m.u); inp.focus(); return; }
+      vals[m.k] = +v.toFixed(1);
+    }
+    if (!Object.keys(vals).length) { toast("Preencha pelo menos uma medida"); return; }
+    const ts = tsOfDay(iso), now = Date.now();
+    Object.keys(vals).forEach(k => {
+      if (k === "peso") db.weights.push({ id: uid(), ts, kg: vals[k], u: now });
+      else db.meas.push({ id: uid(), ts, k, v: vals[k], u: now });
+    });
+    await persist(); closeSheet(); render();
+    const n = Object.keys(vals).length; toast(n === 1 ? "Medida registrada" : n + " medidas registradas");
+  });
+}
+function openMedEdit(rec, k){
+  const def = medDef(k); if (!rec || !def) return;
+  openSheet(
+    '<h2 id="sheetTitle">' + def.n + '</h2><p class="sub">Corrija o valor ou a data, ou apague este registro.</p>' +
+    '<div class="field"><label class="eyebrow" for="meVal">Valor (' + def.u + ')</label><input type="text" inputmode="decimal" id="meVal" maxlength="6" value="' + String(rec.v).replace(".", ",") + '"></div>' +
+    '<div class="field"><label class="eyebrow" for="meDate">Data</label><input type="date" id="meDate" value="' + isoDay(rec.ts) + '" max="' + isoDay(Date.now()) + '"></div>' +
+    '<div class="sheet-actions"><button class="btn btn-ghost" id="meNo" type="button">Cancelar</button><button class="btn btn-primary" id="meSave" type="button">Salvar</button></div>' +
+    '<div class="sheet-actions"><button class="btn btn-danger" id="meDel" type="button">Apagar este registro</button></div>'
+  );
+  const b = document.getElementById("sheetBody");
+  const target = () => rec.src === "w" ? db.weights.find(x => x.id === rec.id) : db.meas.find(x => x.id === rec.id);
+  b.querySelector("#meNo").addEventListener("click", closeSheet);
+  b.querySelector("#meSave").addEventListener("click", async () => {
+    const v = Number(b.querySelector("#meVal").value.trim().replace(",", ".")), iso = b.querySelector("#meDate").value, t = target();
+    if (!isFinite(v) || v < def.min || v > def.max) { toast(def.n + ": informe um valor entre " + def.min + " e " + def.max + " " + def.u); return; }
+    if (!iso || isNaN(new Date(iso + "T12:00:00").getTime())) { toast("Escolha a data"); return; }
+    if (!t) { closeSheet(); render(); return; }
+    if (rec.src === "w") t.kg = +v.toFixed(1); else t.v = +v.toFixed(1);
+    if (iso !== isoDay(t.ts)) t.ts = tsOfDay(iso);
+    t.u = Date.now(); await persist(); closeSheet(); render(); toast("Registro corrigido");
+  });
+  b.querySelector("#meDel").addEventListener("click", async () => {
+    if (rec.src === "w") { db.weights = db.weights.filter(x => x.id !== rec.id); markDeleted("weights", rec.id); }
+    else { db.meas = db.meas.filter(x => x.id !== rec.id); markDeleted("meas", rec.id); }
+    await persist(); closeSheet(); render(); toast("Registro excluído");
+  });
+}
+function openGoal(){
+  const goal = num(db.settings.goalKg);
+  openSheet(
+    '<h2 id="sheetTitle">Meta de peso</h2><p class="sub">Aparece como uma linha tracejada no gráfico e mostra quanto falta.</p>' +
+    '<div class="field"><label class="eyebrow" for="gVal">Meta (kg)</label><input type="text" inputmode="decimal" id="gVal" maxlength="6" placeholder="opcional" value="' + (goal ? String(goal).replace(".", ",") : "") + '"></div>' +
+    '<div class="sheet-actions"><button class="btn btn-ghost" id="gNo" type="button">Cancelar</button><button class="btn btn-primary" id="gSave" type="button">Salvar</button></div>'
+  );
+  const b = document.getElementById("sheetBody");
+  b.querySelector("#gNo").addEventListener("click", closeSheet);
+  b.querySelector("#gSave").addEventListener("click", async () => {
+    const raw = b.querySelector("#gVal").value.trim().replace(",", "."), g = raw === "" ? 0 : Number(raw);
+    if (raw !== "" && !(g >= 20 && g <= 400)) { toast("A meta precisa ficar entre 20 e 400 kg"); return; }
+    db.settings.goalKg = g ? +g.toFixed(1) : 0; await persist(); closeSheet(); render(); toast(g ? "Meta salva" : "Meta removida");
+  });
+}
+
+/* ---------- fotos de progresso ---------- */
+function pickFile(){
+  return new Promise(res => {
+    const inp = document.createElement("input"); inp.type = "file"; inp.accept = "image/*"; inp.style.display = "none";
+    inp.addEventListener("change", () => { res(inp.files[0] || null); inp.remove(); });
+    inp.addEventListener("cancel", () => { res(null); inp.remove(); });
+    document.body.appendChild(inp); inp.click();
+    setTimeout(() => { if (document.body.contains(inp)) { inp.remove(); res(null); } }, 120000);
+  });
+}
+async function addPhoto(){
+  const f = await pickFile(); if (!f) return;
+  toast("Preparando a foto…");
+  let b64; try { b64 = await prepararFoto(f); } catch (e) { toast("Não consegui ler essa imagem"); return; }
+  const store = await ImgDB.persistent(), today = isoDay(Date.now());
+  openSheet(
+    '<h2 id="sheetTitle">Nova foto</h2><p class="sub">' + (Cloud.signedIn() ? "Fica só na sua conta: ninguém mais vê." : (Cloud.enabled ? "Sem conta, a foto fica só neste aparelho. Entre na conta para guardá-la com segurança." : "A foto fica só neste aparelho.")) + (store ? "" : " Atenção: este navegador não guarda fotos entre uma sessão e outra.") + '</p>' +
+    '<img class="pprev" id="pfImg" alt="Prévia da foto">' +
+    '<div class="field" style="margin-top:14px"><label class="eyebrow" for="pfDate">Data da foto</label><input type="date" id="pfDate" value="' + today + '" max="' + today + '"></div>' +
+    '<div class="sheet-actions"><button class="btn btn-ghost" id="pfNo" type="button">Cancelar</button><button class="btn btn-primary" id="pfSave" type="button">Salvar foto</button></div>'
+  );
+  const b = document.getElementById("sheetBody"); b.querySelector("#pfImg").src = b64;
+  b.querySelector("#pfNo").addEventListener("click", closeSheet);
+  b.querySelector("#pfSave").addEventListener("click", async () => {
+    const iso = b.querySelector("#pfDate").value;
+    if (!iso || isNaN(new Date(iso + "T12:00:00").getTime())) { toast("Escolha a data da foto"); return; }
+    await Fotos.save(b64, tsOfDay(iso)); closeSheet(); render(); toast("Foto de progresso salva");
+  });
+}
+function openPhoto(id){
+  const f = db.fotos.find(x => x.id === id); if (!f) return;
+  openSheet(
+    '<h2 id="sheetTitle">' + esc(longDateFull(f.ts)) + '</h2>' +
+    '<div class="pbox skel" id="pBox"></div>' +
+    '<div class="sheet-actions" style="margin-top:14px"><button class="btn btn-soft" id="pBig" type="button">Ampliar</button><button class="btn btn-soft" id="pDate" type="button">Alterar data</button></div>' +
+    '<div class="sheet-actions"><button class="btn btn-danger" id="pDel" type="button">Apagar esta foto</button></div>'
+  );
+  const b = document.getElementById("sheetBody"), box = b.querySelector("#pBox");
+  let src = null;
+  Fotos.image(id).then(s => {
+    box.classList.remove("skel"); src = s;
+    if (s) { const im = document.createElement("img"); im.src = s; im.alt = "Foto de progresso"; im.addEventListener("click", () => Viewer.open(s)); box.appendChild(im); }
+    else box.innerHTML = '<div class="empty" style="margin:0">Não consegui carregar esta foto agora. Confira a conexão e tente de novo.</div>';
+  });
+  b.querySelector("#pBig").addEventListener("click", () => { if (src) Viewer.open(src); else toast("A foto ainda não carregou"); });
+  b.querySelector("#pDate").addEventListener("click", () => {
+    openSheet(
+      '<h2 id="sheetTitle">Data da foto</h2>' +
+      '<div class="field"><label class="eyebrow" for="pdVal">Data</label><input type="date" id="pdVal" value="' + isoDay(f.ts) + '" max="' + isoDay(Date.now()) + '"></div>' +
+      '<div class="sheet-actions"><button class="btn btn-ghost" id="pdNo" type="button">Cancelar</button><button class="btn btn-primary" id="pdSave" type="button">Salvar</button></div>'
+    );
+    const b2 = document.getElementById("sheetBody");
+    b2.querySelector("#pdNo").addEventListener("click", closeSheet);
+    b2.querySelector("#pdSave").addEventListener("click", async () => {
+      const iso = b2.querySelector("#pdVal").value; if (!iso) { toast("Escolha a data"); return; }
+      await Fotos.setDate(id, iso === isoDay(f.ts) ? f.ts : tsOfDay(iso)); closeSheet(); render(); toast("Data corrigida");
+    });
+  });
+  const del = b.querySelector("#pDel"); let armed = false, t = 0;
+  del.addEventListener("click", async () => {
+    if (!armed) { armed = true; del.textContent = "Toque de novo para apagar"; clearTimeout(t); t = setTimeout(() => { armed = false; del.textContent = "Apagar esta foto"; }, 4000); return; }
+    await Fotos.remove(id); closeSheet(); render(); toast("Foto apagada");
+  });
+}
+function openCompare(idA, idB){
+  const A = db.fotos.find(x => x.id === idA), B2 = db.fotos.find(x => x.id === idB); if (!A || !B2) return;
+  const [old, nw] = A.ts <= B2.ts ? [A, B2] : [B2, A];
+  const cell = f => '<div class="cmp"><div class="pbox skel" data-cmp="' + f.id + '"></div><div class="plab">' + esc(dd(f.ts)) + '</div></div>';
+  openSheet('<h2 id="sheetTitle">Antes e depois</h2><div class="cmprow">' + cell(old) + cell(nw) + '</div><div class="sheet-actions" style="margin-top:14px"><button class="btn btn-primary" id="cmpOk" type="button">Fechar</button></div>');
+  const b = document.getElementById("sheetBody"); b.querySelector("#cmpOk").addEventListener("click", closeSheet);
+  b.querySelectorAll("[data-cmp]").forEach(box => Fotos.image(box.dataset.cmp).then(s => {
+    box.classList.remove("skel");
+    if (s) { const im = document.createElement("img"); im.src = s; im.alt = ""; im.addEventListener("click", () => Viewer.open(s)); box.appendChild(im); } else box.classList.add("none");
+  }));
+}
+
+/* ---------- eventos das telas ---------- */
+document.addEventListener("click", ev => {
+  const nav = ev.target.closest("[data-nav]"); if (nav) { go(nav.dataset.nav, nav.dataset.campo); return; }
+  if (ev.target.closest("#subBack")) { goBack(); return; }
+  const act = ev.target.closest("[data-act]");
+  if (act) { if (act.dataset.act === "reg") openMedReg(view === "medida" ? medCampo : null); else if (act.dataset.act === "foto") addPhoto(); return; }
+  const rec = ev.target.closest("[data-mrec]");
+  if (rec) { const s = medSeries(medCampo).find(p => p.id === rec.dataset.mrec); if (s) openMedEdit(s, medCampo); return; }
+  if (ev.target.closest("#goalBtn")) { openGoal(); return; }
+  if (ev.target.closest("#fCmp")) { fotoSel = !fotoSel; fotoPick = []; renderFotos(); return; }
+  const th = ev.target.closest("#fList [data-foto]");
+  if (th) {
+    const id = th.dataset.foto;
+    if (!fotoSel) { openPhoto(id); return; }
+    if (fotoPick.includes(id)) return;
+    fotoPick.push(id); th.classList.add("sel");
+    if (fotoPick.length === 2) { const [a, b] = fotoPick; fotoSel = false; fotoPick = []; renderFotos(); openCompare(a, b); }
+  }
+});
+document.addEventListener("keydown", ev => { if (ev.key === "Escape" && Viewer.el) { ev.preventDefault(); Viewer.close(); } });   // Esc fecha só a camada de cima
 
 /* ---------- início ---------- */
 (async function init(){
@@ -2803,7 +3531,7 @@ document.getElementById("weightCard").addEventListener("click", openWeight);
   render();
   paintCloud();
   Lock.start();
-  document.addEventListener("keydown", e => { if (e.key === "Escape") closeSheet(); });
+  document.addEventListener("keydown", e => { if (e.key === "Escape" && !e.defaultPrevented) closeSheet(); });
   startSW();
   document.getElementById("verNote").textContent = "versão " + APP_VERSION;
   handleUrlAction();
