@@ -472,6 +472,28 @@ canvas.graf{width:100%;height:170px;display:block;touch-action:pan-y;-webkit-use
 #fviewX{position:absolute;top:calc(env(safe-area-inset-top,0px) + 12px);right:14px;width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.16);color:#fff;border:0;font-size:18px;cursor:pointer}
 body.curtain #fview,html[data-locked="1"] #fview{visibility:hidden}
 
+/* ---------- IMC ---------- */
+.imcchip{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;padding:3px 10px 3px 8px;border-radius:99px;background:var(--paper-2);border:1px solid var(--rule-2);color:var(--ink)}
+.imcchip::before{content:'';width:8px;height:8px;border-radius:50%;background:var(--violet)}
+.imcchip[data-f="1"]::before{background:var(--green)}
+.imcchip[data-f="2"]::before{background:var(--mark)}
+.imcchip[data-f="3"]::before{background:#E08A2C}
+.imcchip[data-f="4"]::before,.imcchip[data-f="5"]::before{background:var(--warn)}
+.imcbar{position:relative;display:flex;gap:3px;height:10px;margin:16px 0 4px}
+.imcbar i{display:block;height:100%;border-radius:99px;background:var(--rule-2)}
+.imcbar i.ok{background:var(--green);opacity:.4}
+.imcbar i.on{background:var(--violet);opacity:1}
+.imcbar .mk{position:absolute;top:50%;width:16px;height:16px;border-radius:50%;background:var(--mark);border:2px solid var(--violet);transform:translate(-50%,-50%);box-shadow:0 0 0 4px rgba(var(--violet-rgb),.2)}
+.imcbar .gk{position:absolute;top:50%;width:12px;height:12px;border-radius:50%;background:var(--card);border:2px solid var(--green);transform:translate(-50%,-50%)}
+.imcticks{position:relative;height:14px;margin:0 0 8px}
+.imcticks span{position:absolute;transform:translateX(-50%);font-family:'Martian Mono',monospace;font-size:9.5px;color:var(--muted)}
+.imcres{font-size:14px;line-height:1.5;min-height:22px;margin:2px 0 8px}
+.imcres .dim{color:var(--muted)}
+.imcres .aviso{color:var(--warn)}
+.mrow .mn small{display:block;font-weight:500;font-size:11.5px;color:var(--muted);margin-top:1px}
+.icrow.here{background:var(--paper-2);border-radius:10px;padding-left:8px;padding-right:8px;margin:0 -6px;width:calc(100% + 12px)}
+#icRef .mrow:last-child{border-bottom:0}
+
 /* ---------- tabs ---------- */
 nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:40;
   background:color-mix(in srgb,var(--paper) 90%,transparent);
@@ -831,6 +853,7 @@ hr.dash{border:0;border-top:1px dashed var(--rule-2);margin:16px 0}
   <section id="view-medidas" hidden>
     <div class="section" style="margin-top:16px"><div class="card mcard" id="mFotos"></div></div>
     <div class="section"><div class="card mcard" id="mPeso"></div></div>
+    <div class="section"><div class="card mcard" id="mImc"></div></div>
     <div class="section">
       <div class="section-h"><div class="eyebrow">Medidas</div><div class="line"></div></div>
       <div class="card" id="mLista"></div>
@@ -975,8 +998,8 @@ const DOSES = [2.5, 5, 7.5, 10, 12.5, 15];
 const FEELINGS = ["Tudo bem","Náusea","Enjoo","Azia","Dor no local","Vermelhidão","Hematoma","Cansaço","Intestino preso","Sem fome"];
 
 /* ajustes que viajam com a conta (o tema fica só em cada aparelho) */
-const SYNC_KEYS = ["dose","interval","pharmacy","lot","conc","val","weekday","hour","lead","next","vialMl","vialStart","goalKg"];
-const DEFAULTS = { dose:2.5, interval:7, pharmacy:"", lot:"", conc:"", val:"", weekday:4, hour:"21:00", lead:0, next:0, vialMl:0, vialStart:0, goalKg:0 };
+const SYNC_KEYS = ["dose","interval","pharmacy","lot","conc","val","weekday","hour","lead","next","vialMl","vialStart","goalKg","heightCm"];
+const DEFAULTS = { dose:2.5, interval:7, pharmacy:"", lot:"", conc:"", val:"", weekday:4, hour:"21:00", lead:0, next:0, vialMl:0, vialStart:0, goalKg:0, heightCm:0 };
 /* preferências só deste aparelho: não viajam com a conta */
 const LOCAL_KEYS = ["theme","remind","icsAt","tour","push"];
 const keepLocal = s => { const o = {}; if (s && typeof s === "object") LOCAL_KEYS.forEach(k => { if (k in s) o[k] = s[k]; }); return o; };
@@ -1681,7 +1704,7 @@ const settingsOut = () => ({
   pharmacy: cut(db.settings.pharmacy, 80), lot: cut(db.settings.lot, 60), conc: cut(db.settings.conc, 60),
   val: cut(db.settings.val, 12), weekday: cut(db.settings.weekday, 2), hour: cut(db.settings.hour, 8),
   lead: num(db.settings.lead), next: num(db.settings.next),
-  vialMl: num(db.settings.vialMl), vialStart: num(db.settings.vialStart), goalKg: num(db.settings.goalKg)
+  vialMl: num(db.settings.vialMl), vialStart: num(db.settings.vialStart), goalKg: num(db.settings.goalKg), heightCm: num(db.settings.heightCm)
 });
 function applyRemoteSettings(r){
   const s = db.settings;
@@ -1694,6 +1717,7 @@ function applyRemoteSettings(r){
   if ("vialMl" in r) s.vialMl = num(r.vialMl);
   if ("vialStart" in r) s.vialStart = num(r.vialStart);
   if ("goalKg" in r) s.goalKg = num(r.goalKg);
+  if ("heightCm" in r) s.heightCm = num(r.heightCm);
   s.u = num(r.u);
   resetSig();
 }
@@ -2071,7 +2095,7 @@ window.addEventListener("online", () => { if (Cloud.signedIn()) Cloud.sync("onli
 /* =====================================================
    12. DATA PREVISTA, LEMBRETES, VOLUME DA DOSE, PONTUALIDADE
    ===================================================== */
-const APP_VERSION = '2026.10.14.1'; /*v*/
+const APP_VERSION = '2026.10.14.2'; /*v*/
 const dayStart = ts => { const d = new Date(ts); d.setHours(0, 0, 0, 0); return d.getTime(); };
 const calDays = ts => Math.round((dayStart(ts) - dayStart(Date.now())) / DAY);     // 0 = hoje, 1 = amanhã, -1 = ontem
 const pad2 = n => String(n).padStart(2, "0");
@@ -2572,6 +2596,8 @@ function reportText(m){
   L.push("Dose atual: " + String(s.dose).replace(".", ",") + " mg · intervalo: " + s.interval + " dias");
   if (m.pu) L.push("Pontualidade: " + m.pu.pct + "% (" + m.pu.ok + " de " + m.pu.total + " dentro de ±1 dia do previsto)");
   if (m.ws) L.push("Peso: " + fmtKg(m.ws.first.kg) + " kg → " + fmtKg(m.ws.last.kg) + " kg (" + (m.ws.delta > 0 ? "+" : (m.ws.delta < 0 ? "−" : "")) + fmtKg(Math.abs(m.ws.delta)) + " kg)" + (m.ws.goal ? " · meta " + fmtKg(m.ws.goal) + " kg" : ""));
+  const im = imcAtual();
+  if (im) L.push("Altura: " + fmtAltura(im.cm) + " · IMC atual: " + imcFmt(im.v) + " (" + im.f.n + ") com " + fmtKg(im.kg) + " kg em " + dd(im.ts));
   if (m.feel.length) L.push("Sensações mais citadas: " + m.feel.map(f => f[0] + " (" + f[1] + "×)").join(", "));
   L.push("", "FRASCO");
   L.push("Farmácia: " + (s.pharmacy || "—") + " · Lote: " + (s.lot || "—") + " · Concentração: " + (s.conc || "—") + " · Validade: " + (s.val ? new Date(s.val + "T12:00").toLocaleDateString("pt-BR") : "—"));
@@ -2588,7 +2614,7 @@ function reportText(m){
   return L.join("\n");
 }
 function reportHtml(m){
-  const s = m.s, kv = (k, v) => v ? '<tr><th>' + k + '</th><td>' + v + '</td></tr>' : '';
+  const s = m.s, im = imcAtual(), kv = (k, v) => v ? '<tr><th>' + k + '</th><td>' + v + '</td></tr>' : '';
   return '<article class="rep"><h1>Pontual · resumo do tratamento</h1>' +
     '<p class="rmeta">Gerado em ' + dd(m.now) + ' · ' + repPeriod(m) + '</p>' +
     '<table class="rkv">' +
@@ -2596,6 +2622,7 @@ function reportHtml(m){
     kv("Dose atual", esc(String(s.dose).replace(".", ",")) + " mg · intervalo de " + esc(s.interval) + " dias") +
     kv("Pontualidade", m.pu ? m.pu.pct + "% (" + m.pu.ok + " de " + m.pu.total + " dentro de ±1 dia do previsto)" : "") +
     kv("Peso", m.ws ? fmtKg(m.ws.first.kg) + " kg → " + fmtKg(m.ws.last.kg) + " kg (" + (m.ws.delta > 0 ? "+" : (m.ws.delta < 0 ? "−" : "")) + fmtKg(Math.abs(m.ws.delta)) + " kg)" + (m.ws.goal ? " · meta " + fmtKg(m.ws.goal) + " kg" : "") : "") +
+    kv("IMC atual", im ? imcFmt(im.v) + " (" + esc(im.f.n) + ") · altura " + fmtAltura(im.cm) : "") +
     kv("Sensações mais citadas", m.feel.length ? m.feel.map(f => esc(f[0]) + " (" + f[1] + "×)").join(", ") : "") + '</table>' +
     '<h2>Frasco</h2><table class="rkv">' +
     kv("Farmácia", esc(s.pharmacy || "—")) + kv("Lote", esc(s.lot || "—")) + kv("Concentração", esc(s.conc || "—")) +
@@ -3276,7 +3303,7 @@ const histBtn = k => '<button class="mhist" type="button" data-nav="medida" data
 function renderMedResumo(){
   const box = document.getElementById("medResumo"); if (!box) return;
   const ws = medSeries("peso"), u = ws[ws.length - 1], pr = ws[ws.length - 2];
-  const parts = []; if (db.meas.length) parts.push(db.meas.length + (db.meas.length === 1 ? " medida" : " medidas")); if (db.fotos.length) parts.push(db.fotos.length + (db.fotos.length === 1 ? " foto" : " fotos"));
+  const im = imcAtual(), parts = im ? ["IMC " + imcFmt(im.v)] : []; if (db.meas.length) parts.push(db.meas.length + (db.meas.length === 1 ? " medida" : " medidas")); if (db.fotos.length) parts.push(db.fotos.length + (db.fotos.length === 1 ? " foto" : " fotos"));
   box.innerHTML = '<button class="mhead" type="button" data-nav="medidas"><span class="mtxt">' +
     (u ? '<span class="msub">Peso corporal · ' + dd(u.ts) + '</span><span class="mval"><b>' + fmtV(u.v, "kg") + '</b>' +
          (pr ? '<span class="mdelta ' + (u.v - pr.v <= 0 ? "dn" : "upv") + '">' + deltaTxt(u.v - pr.v) + '</span>' : '') + '</span>'
@@ -3300,6 +3327,7 @@ function renderMedidas(){
     if (goal) wBox.insertAdjacentHTML("beforeend", '<div class="wline"><span class="sd" data-s="ok"></span>' + (Math.abs(u.v - goal) < 0.05 ? "Meta atingida" : "Faltam " + fmtV(Math.abs(u.v - goal), "kg") + " para a meta de " + fmtV(goal, "kg")) + '</div>');
     wBox.insertAdjacentHTML("beforeend", histBtn("peso"));
   } else wBox.innerHTML = '<p class="note" style="margin:0">Registre peso, gordura e medidas para acompanhar a evolução do corpo junto com o tratamento. Toque em Registrar.</p>';
+  renderImcCard();
   // lista
   document.getElementById("mLista").innerHTML = MEDS.map(m => {
     const s = medSeries(m.k), u = s[s.length - 1];
@@ -3321,7 +3349,7 @@ function renderMedida(){
   }
   document.getElementById("dHint").textContent = s.length ? "Toque num registro para corrigir o valor, a data ou apagar." : "";
   document.getElementById("dList").innerHTML = s.length
-    ? s.slice().reverse().map(p => '<button class="mrow" type="button" data-mrec="' + p.id + '"><span class="mn dim">' + longDate(p.ts) + '</span><span class="mv">' + fmtV(p.v, def.u) + '</span>' + CHEV + '</button>').join("")
+    ? s.slice().reverse().map(p => '<button class="mrow" type="button" data-mrec="' + p.id + '"><span class="mn dim">' + longDate(p.ts) + imcSmall(def.k, p.v) + '</span><span class="mv">' + fmtV(p.v, def.u) + '</span>' + CHEV + '</button>').join("")
     : '<div class="empty" style="padding:22px 12px"><p>Sem registros.</p></div>';
 }
 
@@ -3413,10 +3441,12 @@ function openGoal(){
   openSheet(
     '<h2 id="sheetTitle">Meta de peso</h2><p class="sub">Aparece como uma linha tracejada no gráfico e mostra quanto falta.</p>' +
     '<div class="field"><label class="eyebrow" for="gVal">Meta (kg)</label><input type="text" inputmode="decimal" id="gVal" maxlength="6" placeholder="opcional" value="' + (goal ? String(goal).replace(".", ",") : "") + '"></div>' +
+    '<button class="linkbtn" id="gImc" type="button" style="margin:-4px 0 14px;padding:0">Estimar pelo IMC</button>' +
     '<div class="sheet-actions"><button class="btn btn-ghost" id="gNo" type="button">Cancelar</button><button class="btn btn-primary" id="gSave" type="button">Salvar</button></div>'
   );
   const b = document.getElementById("sheetBody");
   b.querySelector("#gNo").addEventListener("click", closeSheet);
+  b.querySelector("#gImc").addEventListener("click", openImc);
   b.querySelector("#gSave").addEventListener("click", async () => {
     const raw = b.querySelector("#gVal").value.trim().replace(",", "."), g = raw === "" ? 0 : Number(raw);
     if (raw !== "" && !(g >= 20 && g <= 400)) { toast("A meta precisa ficar entre 20 e 400 kg"); return; }
@@ -3520,6 +3550,167 @@ document.addEventListener("click", ev => {
   }
 });
 document.addEventListener("keydown", ev => { if (ev.key === "Escape" && Viewer.el) { ev.preventDefault(); Viewer.close(); } });   // Esc fecha só a camada de cima
+
+/* =====================================================
+   18. IMC: valor atual, faixas e calculadora de peso alvo
+   ===================================================== */
+/* Faixas da OMS para adultos. A faixa é decidida pelo valor que aparece na tela (1 casa decimal):
+   o que o usuário lê (ex.: 25,0) e a classificação (sobrepeso) nunca se contradizem. */
+const IMC_FAIXAS = [
+  { min: 0,    n: "Abaixo do peso",     c: 0 },
+  { min: 18.5, n: "Peso adequado",      c: 1 },
+  { min: 25,   n: "Sobrepeso",          c: 2 },
+  { min: 30,   n: "Obesidade grau I",   c: 3 },
+  { min: 35,   n: "Obesidade grau II",  c: 4 },
+  { min: 40,   n: "Obesidade grau III", c: 5 }
+];
+const IMC_MIN_ALVO = 18.5, IMC_MAX_ALVO = 60;       // a calculadora não ajuda a escolher meta abaixo do peso adequado
+const imcOf = (kg, cm) => (kg > 0 && cm > 0) ? kg / Math.pow(cm / 100, 2) : null;
+const imcFmt = v => (Math.round(v * 10) / 10).toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+const imcFaixa = v => { const r = Math.round(v * 10) / 10; let f = IMC_FAIXAS[0]; IMC_FAIXAS.forEach(x => { if (r >= x.min) f = x; }); return f; };
+const pesoDoImc = (imc, cm) => imc * Math.pow(cm / 100, 2);
+const numBR = s => { const t = String(s == null ? "" : s).trim().replace(",", "."); if (t === "") return null; const v = Number(t); return isFinite(v) ? v : null; };
+/* aceita 175, 175,5 ou 1,75 (metros) */
+function parseAltura(txt){
+  let v = numBR(txt); if (v === null) return null;
+  if (v > 0 && v < 3) v *= 100;
+  v = Math.round(v * 10) / 10;
+  return (v >= 100 && v <= 250) ? v : null;
+}
+const fmtAltura = cm => (Math.round(cm * 10) / 10).toLocaleString("pt-BR") + " cm";
+const kgNum = x => (Math.round(x * 10) / 10).toLocaleString("pt-BR", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+const pesoAtual = () => { const s = medSeries("peso"); return s.length ? s[s.length - 1] : null; };
+function imcAtual(){
+  const cm = num(db.settings.heightCm), p = pesoAtual();
+  if (!(cm > 0) || !p) return null;
+  const v = imcOf(p.v, cm);
+  return { v, f: imcFaixa(v), kg: p.v, ts: p.ts, cm };
+}
+const imcSmall = (k, v) => (k === "peso" && num(db.settings.heightCm) > 0) ? '<small>IMC ' + imcFmt(imcOf(v, num(db.settings.heightCm))) + '</small>' : "";
+
+/* barra das faixas com o marcador do IMC atual (e, se houver, da meta) */
+const IMC_LO = 16, IMC_HI = 44, imcPos = v => Math.max(0, Math.min(100, (v - IMC_LO) / (IMC_HI - IMC_LO) * 100));
+function imcBarHtml(v, goalImc){
+  const cuts = [IMC_LO, 18.5, 25, 30, 35, 40, IMC_HI], cur = imcFaixa(v).c;
+  const segs = cuts.slice(0, -1).map((a, i) => '<i class="' + (i === cur ? "on" : (i === 1 ? "ok" : "")) + '" style="flex:' + (cuts[i + 1] - a) + '"></i>').join("");
+  const ticks = [18.5, 25, 30, 35, 40].map(c => '<span style="left:' + imcPos(c).toFixed(1) + '%">' + String(c).replace(".", ",") + '</span>').join("");
+  return '<div class="imcbar" role="img" aria-label="IMC ' + imcFmt(v) + ' na escala de faixas">' + segs + '<b class="mk" style="left:' + imcPos(v).toFixed(1) + '%"></b>' +
+    (goalImc ? '<u class="gk" title="IMC na meta" style="left:' + imcPos(goalImc).toFixed(1) + '%"></u>' : "") + '</div><div class="imcticks">' + ticks + '</div>';
+}
+
+/* cartão na tela Medições */
+function renderImcCard(){
+  const box = document.getElementById("mImc"); if (!box) return;
+  const cm = num(db.settings.heightCm), im = imcAtual(), goal = num(db.settings.goalKg);
+  const head = '<div class="msub">Índice de massa corporal (IMC)</div>';
+  const calc = '<button class="mhist" type="button" data-imc="calc">Calculadora de IMC' + CHEV + '</button>';
+  const altura = '<div class="wline">Altura ' + (cm ? fmtAltura(cm) : "") + (cm ? ' · ' : '') + '<button class="linkbtn" type="button" data-imc="altura" style="padding:0;font-size:inherit;margin-left:5px">' + (cm ? "editar" : "informar") + '</button></div>';
+  if (!cm) {
+    box.innerHTML = head + '<p class="note" style="margin:6px 0 0">Com a sua altura, o app calcula o IMC a partir do peso mais recente e ajuda a estimar um peso alvo.</p>' +
+      '<div class="sheet-actions" style="margin-top:12px"><button class="btn btn-soft" type="button" data-imc="altura">Informar altura</button><button class="btn btn-soft" type="button" data-imc="calc">Calculadora</button></div>';
+    return;
+  }
+  if (!im) { box.innerHTML = head + '<p class="note" style="margin:6px 0 4px">Registre o seu peso para ver o IMC.</p>' + altura + calc; return; }
+  const gI = goal > 0 ? imcOf(goal, cm) : null;
+  box.innerHTML = '<div class="mtop"><div>' + head + '<div class="mval"><b>' + imcFmt(im.v) + '</b><span class="imcchip" data-f="' + im.f.c + '">' + im.f.n + '</span></div></div><div class="mdate">' + dd(im.ts) + '</div></div>' +
+    imcBarHtml(im.v, gI) + altura +
+    (gI ? '<div class="wline"><span class="sd" data-s="ok"></span>Na meta de ' + fmtV(goal, "kg") + ', o IMC seria ' + imcFmt(gI) + '</div>' : '') + calc;
+}
+
+/* altura */
+function openAltura(){
+  const cm = num(db.settings.heightCm);
+  openSheet(
+    '<h2 id="sheetTitle">Sua altura</h2><p class="sub">Usada só para calcular o IMC. Pode digitar em centímetros (175) ou em metros (1,75).</p>' +
+    '<div class="field"><label class="eyebrow" for="hAlt">Altura</label><input type="text" inputmode="decimal" id="hAlt" maxlength="6" placeholder="175" value="' + (cm ? String(cm).replace(".", ",") : "") + '"></div>' +
+    '<div class="sheet-actions"><button class="btn btn-ghost" id="hNo" type="button">Cancelar</button><button class="btn btn-primary" id="hSave" type="button">Salvar</button></div>' +
+    (cm ? '<div style="text-align:center;margin-top:10px"><button class="linkbtn" id="hDel" type="button">Remover altura</button></div>' : '')
+  );
+  const b = document.getElementById("sheetBody");
+  b.querySelector("#hNo").addEventListener("click", closeSheet);
+  b.querySelector("#hSave").addEventListener("click", async () => {
+    const v = parseAltura(b.querySelector("#hAlt").value);
+    if (v === null) { toast("Informe uma altura entre 100 e 250 cm (ou entre 1 e 2,5 m)"); return; }
+    db.settings.heightCm = v; await persist(); closeSheet(); render(); toast("Altura salva: " + fmtAltura(v));
+  });
+  const del = b.querySelector("#hDel");
+  if (del) del.addEventListener("click", async () => { db.settings.heightCm = 0; await persist(); closeSheet(); render(); toast("Altura removida"); });
+}
+
+/* calculadora: IMC de hoje e peso para um IMC alvo */
+function openImc(){
+  let cm0 = num(db.settings.heightCm);
+  const p0 = pesoAtual(), im0 = imcAtual();
+  const alvo0 = (im0 && im0.f.c <= 1) ? Math.round(im0.v * 10) / 10 : 24.9;       // já no peso adequado: mantém; senão, o limite superior da faixa adequada
+  openSheet(
+    '<h2 id="sheetTitle">Calculadora de IMC</h2>' +
+    '<p class="sub">Para adultos. É uma referência geral: não considera massa muscular, idade nem sexo.</p>' +
+    '<div class="two"><div class="field"><label class="eyebrow" for="icKg">Peso (kg)</label><input type="text" inputmode="decimal" id="icKg" maxlength="6" placeholder="00,0" value="' + (p0 ? String(p0.v).replace(".", ",") : "") + '"></div>' +
+    '<div class="field"><label class="eyebrow" for="icCm">Altura (cm)</label><input type="text" inputmode="decimal" id="icCm" maxlength="6" placeholder="175" value="' + (cm0 ? String(cm0).replace(".", ",") : "") + '"></div></div>' +
+    '<div class="imcres" id="icNow"></div>' +
+    '<div id="icSaveH" hidden style="margin:-4px 0 4px"><button class="linkbtn" id="icSaveBtn" type="button" style="padding:0">Salvar esta altura no app</button></div>' +
+    '<div class="eyebrow" style="margin:20px 0 8px">Peso para um IMC alvo</div>' +
+    '<div class="field"><label class="eyebrow" for="icTgt">IMC alvo</label><input type="text" inputmode="decimal" id="icTgt" maxlength="5" value="' + String(alvo0).replace(".", ",") + '"></div>' +
+    '<div class="imcres" id="icOut"></div>' +
+    '<div class="sheet-actions"><button class="btn btn-primary" id="icGoal" type="button">Usar como minha meta de peso</button></div>' +
+    '<div class="eyebrow" style="margin:22px 0 4px">Faixas para a sua altura</div>' +
+    '<p class="note" style="margin:0 0 4px">Toque numa faixa para usar o limite superior dela como IMC alvo.</p>' +
+    '<div id="icRef"></div>' +
+    '<p class="note" style="margin:14px 0 0">Referência da OMS para adultos. Combine a meta de peso com quem acompanha o seu tratamento: o IMC sozinho não diz qual é o peso certo para você.</p>' +
+    '<div class="sheet-actions"><button class="btn btn-ghost" id="icNo" type="button">Fechar</button></div>'
+  );
+  const b = document.getElementById("sheetBody"), $ = s => b.querySelector(s);
+  let alvoOk = null;
+  const refresh = () => {
+    const kg = numBR($("#icKg").value), cm = parseAltura($("#icCm").value), t = numBR($("#icTgt").value);
+    const kgOk = kg !== null && kg >= 20 && kg <= 400;
+    $("#icNow").innerHTML = (kgOk && cm) ? '<b>IMC ' + imcFmt(imcOf(kg, cm)) + '</b> · ' + imcFaixa(imcOf(kg, cm)).n : '<span class="dim">Informe o peso (20 a 400 kg) e a altura (100 a 250 cm).</span>';
+    $("#icSaveH").hidden = !(cm && cm !== cm0);
+    // peso para o IMC alvo
+    let msg = "", tw = null;
+    if (!cm) msg = '<span class="dim">Informe a altura para estimar o peso.</span>';
+    else if (t === null) msg = '<span class="dim">Informe um IMC alvo (de 18,5 a 60).</span>';
+    else if (t < IMC_MIN_ALVO) msg = '<span class="aviso">IMC abaixo de 18,5 é considerado abaixo do peso. Converse com quem acompanha o seu tratamento antes de escolher uma meta nessa faixa.</span>';
+    else if (t > IMC_MAX_ALVO) msg = '<span class="dim">Use um IMC de até 60.</span>';
+    else {
+      tw = Math.round(pesoDoImc(t, cm) * 10) / 10;
+      if (!(tw >= 20 && tw <= 400)) { tw = null; msg = '<span class="dim">Esse IMC dá um peso fora da faixa de 20 a 400 kg.</span>'; }
+      else {
+        const d = kgOk ? tw - kg : null;
+        msg = '<b>' + kgNum(tw) + ' kg</b> para IMC ' + imcFmt(t) + ' com ' + fmtAltura(cm) +
+          (d === null ? "" : (Math.abs(d) < 0.05 ? ' · é o seu peso atual' : (d < 0 ? ' · faltam ' + kgNum(-d) + ' kg' : ' · ' + kgNum(d) + ' kg acima do seu peso atual')));
+      }
+    }
+    alvoOk = tw === null ? null : { tw, t };
+    $("#icOut").innerHTML = msg; $("#icGoal").disabled = alvoOk === null;
+    // faixas com os pesos da altura informada
+    const cur = (kgOk && cm) ? imcFaixa(imcOf(kg, cm)).c : -1;
+    $("#icRef").innerHTML = cm ? IMC_FAIXAS.map((f, i) => {
+      const nx = IMC_FAIXAS[i + 1], hi = nx ? nx.min - 0.1 : null;
+      const lab = i === 0 ? "IMC abaixo de 18,5" : (nx ? "IMC " + String(f.min).replace(".", ",") + " a " + String(Math.round(hi * 10) / 10).replace(".", ",") : "IMC 40 ou mais");
+      const w = i === 0 ? "até " + kgNum(pesoDoImc(18.4, cm)) + " kg" : (nx ? kgNum(pesoDoImc(f.min, cm)) + " a " + kgNum(pesoDoImc(hi, cm)) + " kg" : "a partir de " + kgNum(pesoDoImc(40, cm)) + " kg");
+      const tap = i >= 1 && nx;
+      return '<' + (tap ? 'button type="button" data-ictgt="' + (Math.round(hi * 10) / 10) + '"' : 'div') + ' class="mrow icrow' + (i === cur ? " here" : "") + '"><span class="mn">' + f.n + '<small>' + lab + (i === cur ? " · você está aqui" : "") + '</small></span><span class="mv">' + w + '</span>' + (tap ? CHEV : '') + '</' + (tap ? 'button' : 'div') + '>';
+    }).join("") : '<p class="note" style="margin:6px 0 0">Informe a altura para ver as faixas em kg.</p>';
+  };
+  ["#icKg", "#icCm", "#icTgt"].forEach(s => $(s).addEventListener("input", refresh));
+  $("#icRef").addEventListener("click", ev => { const r = ev.target.closest("[data-ictgt]"); if (r) { $("#icTgt").value = r.dataset.ictgt.replace(".", ","); refresh(); } });
+  $("#icNo").addEventListener("click", closeSheet);
+  $("#icSaveBtn").addEventListener("click", async () => {
+    const cm = parseAltura($("#icCm").value); if (cm === null) return;
+    db.settings.heightCm = cm; cm0 = cm; await persist(); render(); refresh(); toast("Altura salva: " + fmtAltura(cm));
+  });
+  $("#icGoal").addEventListener("click", async () => {
+    if (!alvoOk) return;
+    db.settings.goalKg = alvoOk.tw; await persist(); closeSheet(); render();
+    toast("Meta definida: " + fmtV(alvoOk.tw, "kg") + " (IMC " + imcFmt(alvoOk.t) + ")");
+  });
+  refresh();
+}
+document.addEventListener("click", ev => {
+  const t = ev.target.closest("[data-imc]"); if (!t) return;
+  if (t.dataset.imc === "altura") openAltura(); else if (t.dataset.imc === "calc") openImc();
+});
 
 /* ---------- início ---------- */
 (async function init(){
