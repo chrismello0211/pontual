@@ -494,6 +494,19 @@ body.curtain #fview,html[data-locked="1"] #fview{visibility:hidden}
 .icrow.here{background:var(--paper-2);border-radius:10px;padding-left:8px;padding-right:8px;margin:0 -6px;width:calc(100% + 12px)}
 #icRef .mrow:last-child{border-bottom:0}
 
+/* ---------- quanto já perdeu ---------- */
+.perda{margin:10px 0 6px;padding:12px 13px;border-radius:12px;background:var(--paper-2);border:1px solid var(--rule)}
+.perda .eyebrow{margin-bottom:6px}
+.perda .pl1{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.perda .pnum{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:24px;letter-spacing:-.02em;color:var(--ink)}
+.perda .pnum.dn{color:var(--green)}
+.perda .pl2{font-size:13px;color:var(--ink-2)}
+.perda .pbar{height:8px;border-radius:99px;background:var(--rule-2);overflow:hidden;margin:10px 0 6px}
+.perda .pbar i{display:block;height:100%;border-radius:99px;background:var(--violet)}
+.perda .pbar i.ok{background:var(--green)}
+.perda .pl3{font-size:13px;color:var(--ink-2)}
+.perda .pl3.ok{color:var(--green);font-weight:700}
+
 /* ---------- tabs ---------- */
 nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:40;
   background:color-mix(in srgb,var(--paper) 90%,transparent);
@@ -2095,7 +2108,7 @@ window.addEventListener("online", () => { if (Cloud.signedIn()) Cloud.sync("onli
 /* =====================================================
    12. DATA PREVISTA, LEMBRETES, VOLUME DA DOSE, PONTUALIDADE
    ===================================================== */
-const APP_VERSION = '2026.10.14.2'; /*v*/
+const APP_VERSION = '2026.10.14.3'; /*v*/
 const dayStart = ts => { const d = new Date(ts); d.setHours(0, 0, 0, 0); return d.getTime(); };
 const calDays = ts => Math.round((dayStart(ts) - dayStart(Date.now())) / DAY);     // 0 = hoje, 1 = amanhã, -1 = ontem
 const pad2 = n => String(n).padStart(2, "0");
@@ -3303,10 +3316,12 @@ const histBtn = k => '<button class="mhist" type="button" data-nav="medida" data
 function renderMedResumo(){
   const box = document.getElementById("medResumo"); if (!box) return;
   const ws = medSeries("peso"), u = ws[ws.length - 1], pr = ws[ws.length - 2];
-  const im = imcAtual(), parts = im ? ["IMC " + imcFmt(im.v)] : []; if (db.meas.length) parts.push(db.meas.length + (db.meas.length === 1 ? " medida" : " medidas")); if (db.fotos.length) parts.push(db.fotos.length + (db.fotos.length === 1 ? " foto" : " fotos"));
+  const P = perdaPeso(), im = imcAtual(), parts = [];
+  if (P && P.goal) parts.push(P.chegou ? "Meta atingida" : "Faltam " + fmtV(P.falta, "kg") + " para a meta");
+  if (im) parts.push("IMC " + imcFmt(im.v)); if (db.meas.length) parts.push(db.meas.length + (db.meas.length === 1 ? " medida" : " medidas")); if (db.fotos.length) parts.push(db.fotos.length + (db.fotos.length === 1 ? " foto" : " fotos"));
   box.innerHTML = '<button class="mhead" type="button" data-nav="medidas"><span class="mtxt">' +
     (u ? '<span class="msub">Peso corporal · ' + dd(u.ts) + '</span><span class="mval"><b>' + fmtV(u.v, "kg") + '</b>' +
-         (pr ? '<span class="mdelta ' + (u.v - pr.v <= 0 ? "dn" : "upv") + '">' + deltaTxt(u.v - pr.v) + '</span>' : '') + '</span>'
+         (P && !P.unico ? '<span class="mdelta ' + (P.delta <= 0 ? "dn" : "upv") + '">' + perdaCurta(P) + '</span>' : '') + '</span>'
        : '<span class="msub">Peso, medidas e fotos</span><span class="mval"><b style="font-size:17px">Comece a acompanhar</b></span>') +
     (parts.length ? '<span class="msub">' + parts.join(" · ") + '</span>' : '') + '</span>' + CHEV + '</button>';
 }
@@ -3322,9 +3337,8 @@ function renderMedidas(){
   if (ws.length) {
     const u = ws[ws.length - 1], pr = ws[ws.length - 2], goal = num(db.settings.goalKg);
     wBox.innerHTML = '<div class="mtop"><div><div class="msub">Peso corporal</div><div class="mval"><b>' + fmtV(u.v, "kg") + '</b>' +
-      (pr ? '<span class="mdelta ' + (u.v - pr.v <= 0 ? "dn" : "upv") + '">' + deltaTxt(u.v - pr.v) + '</span>' : '') + '</div></div><div class="mdate">' + dd(u.ts) + '</div></div>';
+      (pr ? '<span class="mdelta ' + (u.v - pr.v <= 0 ? "dn" : "upv") + '">' + deltaTxt(u.v - pr.v) + '</span>' : '') + '</div></div><div class="mdate">' + dd(u.ts) + '</div></div>' + perdaHtml(perdaPeso());
     if (ws.length >= 2) { const cv = document.createElement("canvas"); cv.className = "graf"; wBox.appendChild(cv); requestAnimationFrame(() => plotSerie(cv, ws, "peso")); }
-    if (goal) wBox.insertAdjacentHTML("beforeend", '<div class="wline"><span class="sd" data-s="ok"></span>' + (Math.abs(u.v - goal) < 0.05 ? "Meta atingida" : "Faltam " + fmtV(Math.abs(u.v - goal), "kg") + " para a meta de " + fmtV(goal, "kg")) + '</div>');
     wBox.insertAdjacentHTML("beforeend", histBtn("peso"));
   } else wBox.innerHTML = '<p class="note" style="margin:0">Registre peso, gordura e medidas para acompanhar a evolução do corpo junto com o tratamento. Toque em Registrar.</p>';
   renderImcCard();
@@ -3406,7 +3420,8 @@ function openMedReg(focusK){
       else db.meas.push({ id: uid(), ts, k, v: vals[k], u: now });
     });
     await persist(); closeSheet(); render();
-    const n = Object.keys(vals).length; toast(n === 1 ? "Medida registrada" : n + " medidas registradas");
+    const n = Object.keys(vals).length, pc = vals.peso ? perdaCurta(perdaPeso()) : "";
+    toast((n === 1 ? "Medida registrada" : n + " medidas registradas") + (pc ? " · " + pc : ""));
   });
 }
 function openMedEdit(rec, k){
@@ -3711,6 +3726,42 @@ document.addEventListener("click", ev => {
   const t = ev.target.closest("[data-imc]"); if (!t) return;
   if (t.dataset.imc === "altura") openAltura(); else if (t.dataset.imc === "calc") openImc();
 });
+
+/* =====================================================
+   19. QUANTO JÁ PERDEU E QUANTO FALTA PARA A META
+   (versão simples do "objetivo de peso" do ForgeX: aqui o objetivo é sempre perder,
+    e a conta parte sempre do PRIMEIRO peso registrado)
+   ===================================================== */
+function perdaPeso(){
+  const s = medSeries("peso"); if (!s.length) return null;
+  const b = s[0], u = s[s.length - 1], goal = num(db.settings.goalKg);
+  const delta = Math.round((u.v - b.v) * 10) / 10;
+  const dias = Math.max(0, Math.round((dayStart(u.ts) - dayStart(b.ts)) / DAY));     // dias do calendário (duas pesagens no mesmo dia = 0)
+  const tempo = dias < 1 ? "" : (dias < 14 ? dias + (dias === 1 ? " dia" : " dias") : Math.round(dias / 7) + " semanas");
+  const r = { b, u, delta, dias, tempo, unico: s.length === 1, goal: goal > 0 ? goal : null, falta: null, prog: null, chegou: false };
+  if (r.goal) {
+    r.chegou = u.v <= r.goal + 0.05;
+    r.falta = r.chegou ? 0 : Math.round((u.v - r.goal) * 10) / 10;
+    r.prog = b.v > r.goal ? Math.max(0, Math.min(1, (b.v - u.v) / (b.v - r.goal))) : (r.chegou ? 1 : 0);
+  }
+  return r;
+}
+const faltaTxt = P => P.chegou ? "Meta atingida: " + fmtV(P.goal, "kg") : "Faltam " + fmtV(P.falta, "kg") + " para a meta de " + fmtV(P.goal, "kg");
+/* resumo curto para avisos e para o Diário: "−5,3 kg desde 06/08" */
+const perdaCurta = P => (P && !P.unico) ? (P.delta === 0 ? "mesmo peso de " : deltaTxt(P.delta) + " desde ") + shortDate(P.b.ts) : "";
+function perdaHtml(P){
+  if (!P) return "";
+  const meta = P.goal
+    ? '<div class="pbar" role="img" aria-label="' + Math.round(P.prog * 100) + '% do caminho até a meta"><i class="' + (P.chegou ? "ok" : "") + '" style="width:' + Math.round(P.prog * 100) + '%"></i></div>' +
+      '<div class="pl3' + (P.chegou ? " ok" : "") + '">' + faltaTxt(P) + '</div>'
+    : '<button class="linkbtn" type="button" id="perdaMeta" style="padding:0;margin-top:8px;font-size:13px">Defina uma meta de peso para ver quanto falta</button>';
+  if (P.unico) return '<div class="perda"><div class="eyebrow">Desde o primeiro registro</div><div class="pl2">Registre o próximo peso para ver quanto você perdeu desde ' + dd(P.b.ts) + '.</div>' + meta + '</div>';
+  const num1 = P.delta === 0 ? "Mesmo peso" : deltaTxt(P.delta);
+  return '<div class="perda"><div class="eyebrow">Desde o primeiro registro · ' + dd(P.b.ts) + '</div>' +
+    '<div class="pl1"><span class="pnum' + (P.delta < 0 ? " dn" : "") + '">' + num1 + '</span>' +
+    '<span class="pl2">' + fmtV(P.b.v, "kg") + ' → ' + fmtV(P.u.v, "kg") + (P.tempo ? ' · em ' + P.tempo : '') + '</span></div>' + meta + '</div>';
+}
+document.addEventListener("click", ev => { if (ev.target.closest("#perdaMeta")) openGoal(); });
 
 /* ---------- início ---------- */
 (async function init(){
